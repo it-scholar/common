@@ -1,0 +1,82 @@
+name: Build and Release Slides
+permissions:
+  contents: write
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Marp CLI
+        run: |
+          npm install -g @marp-team/marp-cli
+          npm install -g @mermaid-js/mermaid-cli
+
+      - name: Create output directory
+        run: mkdir -p dist
+
+      - name: Build Mermaid diagrams
+        run: |
+          for file in assets/mermaid/*.mmd; do
+              echo "Building Mermaid diagram: $file"
+              node build-mermaid.js "$file"
+          done
+
+      - name: Build all Marp slides in /slides directory to PDF
+        run: |
+          for file in slides/*.md; do
+            filename=$(basename "$file" .md)
+            output="dist/${PROJECT_NAME}-${filename}.pdf"
+            echo "Building $file → $output"
+            marp "$file" --pdf --allow-local-files --pdf-outlines --output "$output"
+          done
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-slides
+          path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-slides
+          path: dist
+
+      - name: Set version
+        id: version
+        run: |
+            YEAR=$(date +'%Y')
+            MONTH=$(date +'%m')
+            VERSION="$YEAR.$MONTH.${{ github.run_number }}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+            name: ${{ env.PROJECT_NAME }} Slides v${{ steps.version.outputs.version }}
+            tag_name: ${{ env.PROJECT_NAME }}-slides-v${{ steps.version.outputs.version }}
+            files: dist/*.pdf
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,10 @@
+{
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": ".*\\.mmd$",
+        "cmd": "node build-mermaid.js ${file}"
+      }
+    ]
+  }
+}
