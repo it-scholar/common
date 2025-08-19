@@ -12,7 +12,7 @@ const absInput = path.resolve(inputFile);
 const absOutput = absInput.replace(/\.mmd$/, ".svg");
 const configFile = path.resolve("common/puppeteer-config.json");
 
-const cmd = `npx -y @mermaid-js/mermaid-cli -i "${absInput}" -o "${absOutput}" --puppeteerConfigFile "${configFile}"`;
+const cmd = `npx -y @mermaid-js/mermaid-cli -i "${absInput}" --theme common/marp-theme.css -o "${absOutput}" --puppeteerConfigFile "${configFile}"`;
 
 console.log("Running command:", cmd);
 
