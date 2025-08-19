@@ -60,7 +60,7 @@ runs:
         if compgen -G "${{ inputs.mermaid-dir }}/*.mmd" > /dev/null; then
           for file in "${{ inputs.mermaid-dir }}"/*.mmd; do
             echo "Building Mermaid diagram: $file"
-            node build-mermaid.js "$file"
+            node ./common/build-mermaid.js "$file"
           done
         else
           echo "No Mermaid files found in ${{ inputs.mermaid-dir }}, skipping."
