@@ -2,9 +2,7 @@ name: Build and Release Slides
 permissions:
   contents: write
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_call:
 
 env:
   PROJECT_NAME: ${{ github.event.repository.name }}
