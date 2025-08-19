@@ -104,4 +104,4 @@ runs:
         tag_name: ${{ env.PROJECT_NAME }}-slides-v${{ steps.version.outputs.version }}
         files: ${{ inputs.output-dir }}/*.pdf
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
