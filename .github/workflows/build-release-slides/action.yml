@@ -1,0 +1,107 @@
+name: Build and Release Slides
+description: Build Marp PDFs (and release on main)
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: "18"
+  slides-dir:
+    description: Directory containing .md slide files
+    required: false
+    default: "slides"
+  mermaid-dir:
+    description: Directory containing .mmd files
+    required: false
+    default: "assets/mermaid"
+  output-dir:
+    description: Output directory for PDFs
+    required: false
+    default: "dist"
+  project-name:
+    description: Project name for artifact/release naming (defaults to repo name)
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set PROJECT_NAME
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.project-name }}" ]; then
+          echo "PROJECT_NAME=${{ inputs.project-name }}" >> "$GITHUB_ENV"
+        else
+          # use repo name from owner/repo
+          echo "PROJECT_NAME=${GITHUB_REPOSITORY##*/}" >> "$GITHUB_ENV"
+        fi
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install Marp & Mermaid CLI
+      shell: bash
+      run: |
+        npm install -g @marp-team/marp-cli
+        npm install -g @mermaid-js/mermaid-cli
+
+    - name: Create output directory
+      shell: bash
+      run: mkdir -p "${{ inputs.output-dir }}"
+
+    - name: Build Mermaid diagrams
+      shell: bash
+      run: |
+        if compgen -G "${{ inputs.mermaid-dir }}/*.mmd" > /dev/null; then
+          for file in "${{ inputs.mermaid-dir }}"/*.mmd; do
+            echo "Building Mermaid diagram: $file"
+            node build-mermaid.js "$file"
+          done
+        else
+          echo "No Mermaid files found in ${{ inputs.mermaid-dir }}, skipping."
+        fi
+
+    - name: Build all Marp slides to PDF
+      shell: bash
+      run: |
+        shopt -s nullglob
+        for file in "${{ inputs.slides-dir }}"/*.md; do
+          filename="$(basename "$file" .md)"
+          output="${{ inputs.output-dir }}/${PROJECT_NAME}-${filename}.pdf"
+          echo "Building $file → $output"
+          marp "$file" --pdf --allow-local-files --pdf-outlines --output "$output"
+        done
+        echo "Built PDFs:"
+        ls -la "${{ inputs.output-dir }}"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PROJECT_NAME }}-slides
+        path: ${{ inputs.output-dir }}/
+
+    # ---- Release only on main ----
+    - name: Set version
+      id: version
+      if: ${{ github.ref == 'refs/heads/main' }}
+      shell: bash
+      run: |
+        YEAR=$(date +'%Y')
+        MONTH=$(date +'%m')
+        VERSION="$YEAR.$MONTH.${{ github.run_number }}"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+    - name: Create GitHub release
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: softprops/action-gh-release@v2
+      with:
+        name: ${{ env.PROJECT_NAME }} Slides v${{ steps.version.outputs.version }}
+        tag_name: ${{ env.PROJECT_NAME }}-slides-v${{ steps.version.outputs.version }}
+        files: ${{ inputs.output-dir }}/*.pdf
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
