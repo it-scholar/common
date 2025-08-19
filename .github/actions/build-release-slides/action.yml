@@ -74,7 +74,7 @@ runs:
           filename="$(basename "$file" .md)"
           output="${{ inputs.output-dir }}/${PROJECT_NAME}-${filename}.pdf"
           echo "Building $file → $output"
-          marp "$file" --pdf --allow-local-files --pdf-outlines --output "$output"
+          marp "$file" --pdf --allow-local-files --theme common/marp-theme.css --pdf-outlines --output "$output"
         done
         echo "Built PDFs:"
         ls -la "${{ inputs.output-dir }}"
