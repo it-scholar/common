@@ -5,7 +5,7 @@ inputs:
   node-version:
     description: Node.js version to use
     required: false
-    default: "18"
+    default: "20"
   slides-dir:
     description: Directory containing .md slide files
     required: false
@@ -43,12 +43,12 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
+        cache: "npm"
+        cache-dependency-path: common/package-lock.json
 
     - name: Install Marp & Mermaid CLI
       shell: bash
-      run: |
-        npm install -g @marp-team/marp-cli
-        npm install -g @mermaid-js/mermaid-cli
+      run: npm ci --prefix common
 
     - name: Create output directory
       shell: bash
@@ -74,7 +74,7 @@ runs:
           filename="$(basename "$file" .md)"
           output="${{ inputs.output-dir }}/${PROJECT_NAME}-${filename}.pdf"
           echo "Building $file → $output"
-          marp "$file" --pdf --allow-local-files --pdf-outlines --output "$output"
+          ./common/node_modules/.bin/marp "$file" --pdf --allow-local-files --pdf-outlines --output "$output"
         done
         echo "Built PDFs:"
         ls -la "${{ inputs.output-dir }}"

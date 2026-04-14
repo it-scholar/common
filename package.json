@@ -1,0 +1,13 @@
+{
+  "name": "it-scholar-common",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared build tooling for Marp slide decks and Mermaid diagrams",
+  "scripts": {
+    "build:mermaid": "node build-mermaid.js"
+  },
+  "dependencies": {
+    "@marp-team/marp-cli": "4.3.1",
+    "@mermaid-js/mermaid-cli": "11.12.0"
+  }
+}
