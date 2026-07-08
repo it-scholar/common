@@ -56,40 +56,106 @@
   \begin{titlepage}%
     \thispagestyle{empty}%
     \setstretch{1.0}%
-    %%
-    %% Editorial minimalism title page — follows BCP business-plan design language:
-    %% white background, single gold accent, generous white space, bold sans type.
-    %%
-    \vspace*{3.5cm}%
-    %% Series label: tiny, uppercase, very gray (matches business plan top label)
-    \noindent
-    {\tiny\sffamily\color{black!40}\MakeUppercase{\@bookseries}}%
-    \par\vspace{1.8cm}%
-    %% Gold square accent mark
-    \noindent\textcolor{bcpAccent}{\rule{0.55em}{0.55em}}\par\vspace{0.5cm}%
-    %% Book title — very large bold sans (matches business plan BUSINESS/PLAN weight)
-    \noindent
-    {\fontsize{44pt}{46pt}\selectfont\sffamily\bfseries\color{black}\@booktitle\par}%
-    %% Subtitle — if present, smaller, gray
-    \ifx\@booksubtitle\empty\else
-      \vspace{0.8cm}%
-      \noindent{\large\sffamily\color{black!50}\@booksubtitle\par}%
-    \fi
-    \vspace{1.4cm}%
-    %% Short gold accent line (matches business plan short gold line)
-    \noindent{\color{bcpAccent}\rule{8cm}{1.5pt}}\par
-    \vfill
-    %% Author block with gold square (matches business plan info block style)
-    \noindent
-    \textcolor{bcpAccent}{\rule{0.5em}{0.5em}}\enspace
-    {\normalsize\sffamily\bfseries\color{black}\@bookauthor}%
-    \par\vspace{0.3cm}%
-    {\small\sffamily\color{black!50}%
-      \@bookedition\enspace\textperiodcentered\enspace Version~\@bookversion}%
-    \par\vspace{1.2cm}%
-    %% Bottom separator + series name
-    \noindent{\color{black!12}\rule{\textwidth}{0.4pt}}\\[4pt]%
-    {\tiny\sffamily\color{black!35}\@bookseries}%
+    \null%  % minimal flow content; all layout is in TikZ overlay
+    \begin{tikzpicture}[remember picture, overlay]
+
+      %% ── Left gold accent bar — full-height vertical stripe ──────────────────
+      \fill[bcpAccent]
+        (current page.north west)
+        rectangle
+        ([xshift=5pt]current page.south west);
+
+      %% ── Series label — top-left, tiny uppercase, very gray ──────────────────
+      \node[
+        anchor    = north west,
+        xshift    = 1.4cm, yshift = -2.0cm,
+        inner sep = 0pt,
+      ] at (current page.north west)
+        {{\fontsize{6.5pt}{8pt}\selectfont\sffamily\color{black!35}%
+          \MakeUppercase{\@bookseries}}};
+
+      %% ── Gold square accent mark ─────────────────────────────────────────────
+      \node[
+        anchor    = north west,
+        xshift    = 1.4cm, yshift = -4.8cm,
+        inner sep = 0pt,
+      ] at (current page.north west)
+        {\textcolor{bcpAccent}{\rule{0.65em}{0.65em}}};
+
+      %% ── Book title — large bold sans, hyphenation suppressed ────────────────
+      %% 32pt at 14cm: "Linux for Application" ≈ 13.2cm → clean 2-line layout.
+      %% \hyphenpenalty and \exhyphenpenalty must be set BEFORE \node (scope of
+      %% the enclosing tikzpicture, not inside the node text group).
+      \hyphenpenalty=10000\relax
+      \exhyphenpenalty=10000\relax
+      \node[
+        anchor     = north west,
+        xshift     = 1.4cm, yshift = -5.8cm,
+        text width = 14.0cm,
+        align      = left,
+        inner sep  = 0pt,
+      ] at (current page.north west)
+        {{\fontsize{32pt}{38pt}\selectfont\sffamily\bfseries\color{black}%
+          \@booktitle}};
+      \hyphenpenalty=50\relax
+      \exhyphenpenalty=50\relax
+
+      %% ── Subtitle — gray, fixed position for up to 3 title lines ────────────
+      \ifdefempty{\@booksubtitle}{}{%
+        \node[
+          anchor     = north west,
+          xshift     = 1.4cm, yshift = -12.0cm,
+          text width = 14.0cm,
+          align      = left,
+          inner sep  = 0pt,
+        ] at (current page.north west)
+          {{\fontsize{12pt}{17pt}\selectfont\sffamily\color{black!50}%
+            \@booksubtitle}};
+      }
+
+      %% ── Short gold accent line — separator ──────────────────────────────────
+      \fill[bcpAccent]
+        ([xshift=1.4cm, yshift=-14.2cm]current page.north west)
+        rectangle
+        ([xshift=9.9cm, yshift=-14.35cm]current page.north west);
+
+      %% ── Ghost word — bottom-right, extremely pale ───────────────────────────
+      %% Set via \bookghostword{WORD} in config/metadata.tex.
+      \ifdefempty{\@bookghostword}{}{%
+        \node[
+          anchor    = south east,
+          xshift    = -0.2cm, yshift = 0.6cm,
+          inner sep = 0pt,
+        ] at (current page.south east)
+          {{\fontsize{120pt}{120pt}\selectfont\sffamily\bfseries\color{black!5}%
+            \@bookghostword}};
+      }
+
+      %% ── Author name — bottom-left, gold square, bold ────────────────────────
+      \node[
+        anchor    = south west,
+        xshift    = 1.4cm, yshift = 3.6cm,
+        inner sep = 0pt,
+      ] at (current page.south west)
+        {{\normalsize\sffamily\bfseries\color{black}%
+          \textcolor{bcpAccent}{\rule{0.5em}{0.5em}}\enspace\@bookauthor}};
+
+      %% ── Edition / version — small gray ──────────────────────────────────────
+      \node[
+        anchor    = south west,
+        xshift    = 1.4cm, yshift = 2.4cm,
+        inner sep = 0pt,
+      ] at (current page.south west)
+        {{\fontsize{9pt}{11pt}\selectfont\sffamily\color{black!45}%
+          \@bookedition\enspace\textperiodcentered\enspace Version~\@bookversion}};
+
+      %% ── Bottom gold line ─────────────────────────────────────────────────────
+      \fill[bcpAccent]
+        ([yshift=0.75cm]current page.south west)
+        rectangle
+        ([xshift=0.42\paperwidth, yshift=0.803cm]current page.south west);
+
+    \end{tikzpicture}%
   \end{titlepage}%
   \cleardoublepage
 }

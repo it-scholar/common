@@ -72,6 +72,7 @@
 \newcommand{\@bookseries}{BCP Education}
 \newcommand{\@booksubject}{}
 \newcommand{\@bookdescription}{}
+\newcommand{\@bookghostword}{}   % short word for ghost type on title page (e.g. LINUX)
 
 \NewDocumentCommand{\booktitle}     {m}{\renewcommand{\@booktitle}{#1}}
 \NewDocumentCommand{\booksubtitle}  {m}{\renewcommand{\@booksubtitle}{#1}}
@@ -82,6 +83,7 @@
 \NewDocumentCommand{\bookseries}    {m}{\renewcommand{\@bookseries}{#1}}
 \NewDocumentCommand{\booksubject}   {m}{\renewcommand{\@booksubject}{#1}}
 \NewDocumentCommand{\bookdescription}{m}{\renewcommand{\@bookdescription}{#1}}
+\NewDocumentCommand{\bookghostword} {m}{\renewcommand{\@bookghostword}{#1}}
 
 %% ─── Load sub-packages in dependency order ────────────────────────────────
 %%
