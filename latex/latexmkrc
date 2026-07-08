@@ -1,19 +1,36 @@
 # latexmkrc — Custom dependency rules for BCP Education books
 # This file is included by Makefile.common via the -r flag.
-# It teaches latexmk how to run makeglossaries automatically.
+# It teaches latexmk how to run makeglossaries and biber automatically.
+
+# ── Bibliography (biblatex + biber) ───────────────────────────────────────────
+# $bibtex_use = 2: run biber/bibtex even when .bbl is newer than .aux.
+# Without this explicit setting, latexmk may fall back to plain bibtex when
+# the .bcf file is not found at startup (e.g. fresh build with out/ empty).
+$bibtex_use = 2;
 
 # ── Glossaries (glossaries-extra) ─────────────────────────────────────────────
 # .glo → .gls  (main glossary)
 # .acn → .acr  (acronym list)
-# latexmk passes the base filename (no extension) as $_[0].
+# When -output-directory=out is used, latexmk passes $_[0] as 'out/jobname'
+# (full path). makeglossaries needs the directory (-d) and base name split.
 add_cus_dep('glo', 'gls', 0, 'run_makeglossaries');
 add_cus_dep('acn', 'acr', 0, 'run_makeglossaries');
 
 sub run_makeglossaries {
-    if ( $silent ) {
-        return system("makeglossaries -q '$_[0]'");
+    my ($base_name, $path);
+    my $arg = $_[0];
+    if ( $arg =~ /^(.*\/)([^\/]*)$/ ) {
+        ($path, $base_name) = ($1, $2);
     } else {
-        return system("makeglossaries '$_[0]'");
+        ($path, $base_name) = ('', $arg);
+    }
+    my $cmd = $silent
+        ? "makeglossaries -q"
+        : "makeglossaries";
+    if ($path) {
+        return system("$cmd -d '$path' '$base_name'");
+    } else {
+        return system("$cmd '$base_name'");
     }
 }
 

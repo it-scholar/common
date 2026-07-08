@@ -26,6 +26,7 @@
 # ── Defaults (can be overridden by the book's Makefile before include) ────────
 MAIN      ?= main
 TEXENGINE ?= xelatex
+OUT_DIR   ?= out
 
 # ── Derived paths ─────────────────────────────────────────────────────────────
 # MAKEFILE_LIST includes this file as the last entry when included.
@@ -51,54 +52,54 @@ LATEXMK_FLAGS := \
   -interaction=nonstopmode \
   -halt-on-error \
   -file-line-error \
-  -bibtex \
-  -r $(COMMON_DIR)latexmkrc
+  -r $(COMMON_DIR)latexmkrc \
+  -output-directory=$(OUT_DIR)
 
-# Index style file: copy from common to build dir so imakeidx finds it
+# Index style file: copy from common to book root so imakeidx finds it
 IST_SRC  := $(COMMON_DIR)bcpedu-index.ist
 IST_DEST := $(BOOK_DIR)bcpedu-index.ist
 
-# ── Output filenames ──────────────────────────────────────────────────────────
-DIGITAL_PDF := $(MAIN)-digital.pdf
-PRINT_PDF   := $(MAIN)-print.pdf
+# ── Output filenames (inside OUT_DIR) ─────────────────────────────────────────
+DIGITAL_PDF := $(OUT_DIR)/$(MAIN)-digital.pdf
+PRINT_PDF   := $(OUT_DIR)/$(MAIN)-print.pdf
 
 # =============================================================================
 # Targets
 # =============================================================================
 
-.PHONY: all digital print clean distclean watch lint help
+.PHONY: all digital print clean distclean watch lint help _copy_ist _ensure_outdir
 
 ## Default target: build digital PDF
 all: digital
 
 ## digital — full-color PDF (default for screen/distribution)
-digital: _copy_ist
+digital: _ensure_outdir _copy_ist
 	@echo "==> Building digital PDF: $(DIGITAL_PDF)"
 	TEXINPUTS="$(TEXINPUTS_FULL)" \
 	  latexmk $(LATEXMK_FLAGS) \
-	  -jobname=$(basename $(DIGITAL_PDF)) \
+	  -jobname=$(MAIN)-digital \
 	  -pretex="\PassOptionsToClass{digital}{bcpedu}" \
 	  -usepretex \
 	  $(MAIN).tex
 	@echo "==> Done: $(DIGITAL_PDF)"
 
 ## print — grayscale-safe PDF (for print-on-demand services)
-print: _copy_ist
+print: _ensure_outdir _copy_ist
 	@echo "==> Building print PDF: $(PRINT_PDF)"
 	TEXINPUTS="$(TEXINPUTS_FULL)" \
 	  latexmk $(LATEXMK_FLAGS) \
-	  -jobname=$(basename $(PRINT_PDF)) \
+	  -jobname=$(MAIN)-print \
 	  -pretex="\PassOptionsToClass{print}{bcpedu}" \
 	  -usepretex \
 	  $(MAIN).tex
 	@echo "==> Done: $(PRINT_PDF)"
 
 ## watch — live rebuild on file changes (Ctrl-C to stop)
-watch: _copy_ist
+watch: _ensure_outdir _copy_ist
 	@echo "==> Watching for changes (digital mode). Press Ctrl-C to stop."
 	TEXINPUTS="$(TEXINPUTS_FULL)" \
 	  latexmk $(LATEXMK_FLAGS) -pvc \
-	  -jobname=$(basename $(DIGITAL_PDF)) \
+	  -jobname=$(MAIN)-digital \
 	  -pretex="\PassOptionsToClass{digital}{bcpedu}" \
 	  -usepretex \
 	  $(MAIN).tex
@@ -111,25 +112,23 @@ lint:
 	  echo "lacheck not found — skipping lint"; \
 	fi
 
-## clean — remove auxiliary files, keep PDFs
+## clean — remove all build artifacts (out/ + any stray root-level files)
 clean:
 	@echo "==> Cleaning auxiliary files"
-	latexmk -c $(MAIN).tex 2>/dev/null || true
+	TEXINPUTS="$(TEXINPUTS_FULL)" latexmk $(LATEXMK_FLAGS) -c $(MAIN).tex 2>/dev/null || true
+	rm -rf $(OUT_DIR) _minted/
 	rm -f *.aux *.log *.out *.toc *.lof *.lot *.lol \
-	      *.bbl *.bcf *.blg *.run.xml \
-	      *.idx *.ilg *.ind \
-	      *.glo *.gls *.glg *.ist \
-	      *.alg *.acr *.acn \
-	      *.fls *.fdb_latexmk \
-	      *.synctex.gz *.synctex\(busy\) \
-	      _minted-*/ svg-inkscape/ \
+	      *.bbl *.bcf *.blg *.run.xml *.bcf-SAVE-ERROR *.bbl-SAVE-ERROR \
+	      *.idx *.ilg *.ind *.ist \
+	      *.glo *.gls *.glg *.acn *.acr *.alg \
+	      *.fls *.fdb_latexmk *.synctex.gz *.synctex\(busy\) \
+	      *.listing *.minted *.xdv *.pdf \
+	      svg-inkscape/ \
 	      $(IST_DEST) 2>/dev/null || true
 	@echo "==> Clean done"
 
-## distclean — remove ALL build artifacts including PDFs
+## distclean — alias for clean (out/ holds everything, including PDFs)
 distclean: clean
-	@echo "==> Removing PDFs"
-	rm -f $(DIGITAL_PDF) $(PRINT_PDF) $(MAIN).pdf
 	@echo "==> Distclean done"
 
 ## help — show available targets
@@ -143,11 +142,15 @@ help:
 	@echo "Configuration:"
 	@echo "  MAIN      = $(MAIN)"
 	@echo "  TEXENGINE = $(TEXENGINE)"
+	@echo "  OUT_DIR   = $(OUT_DIR)"
 	@echo "  BOOK_DIR  = $(BOOK_DIR)"
 	@echo "  COMMON    = $(COMMON_DIR)"
 	@echo ""
 
 # ── Internal targets ──────────────────────────────────────────────────────────
+_ensure_outdir:
+	@mkdir -p $(BOOK_DIR)$(OUT_DIR)
+
 _copy_ist:
 	@if [ ! -f "$(IST_DEST)" ]; then \
 	  cp "$(IST_SRC)" "$(IST_DEST)" 2>/dev/null || true; \
