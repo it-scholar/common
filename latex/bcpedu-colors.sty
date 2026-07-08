@@ -28,13 +28,14 @@
 \definecolor{bcpRule}     {HTML}{CCCCCC}   % horizontal rules, borders
 \definecolor{bcpPageBg}   {HTML}{FFFFFF}   % page background
 
-%% ─── Primary accent: deep steel blue ─────────────────────────────────────────
-%% This is the single series-wide accent. Individual books can override
-%% \colorlet{bcpAccent}{...} in their preamble after loading the class.
-\definecolor{bcpAccentBase}  {HTML}{1A4980}   % primary accent (headings, rules, labels)
-\definecolor{bcpAccentDark}  {HTML}{0D2D55}   % darker shade (hover / print shadow)
-\definecolor{bcpAccentLight} {HTML}{E8F0FA}   % very light tint (callout backgrounds)
-\definecolor{bcpAccentMid}   {HTML}{3A7EC8}   % mid accent (links digital)
+%% ─── Primary accent: warm golden amber ──────────────────────────────────────
+%% Clean, modern amber palette — editorial warmth, clean contrast.
+%% Individual books can override \colorlet{bcpAccent}{...} after loading the class.
+\definecolor{bcpAccentBase}  {HTML}{CA8208}   % golden amber (headings, rules, labels)
+\definecolor{bcpAccentDark}  {HTML}{7B4E00}   % deep amber (print mode)
+\definecolor{bcpAccentLight} {HTML}{FFF9E6}   % pale warm tint (callout backgrounds)
+\definecolor{bcpAccentMid}   {HTML}{E8960A}   % bright amber (links, sub-headings)
+\definecolor{bcpDark}        {HTML}{18181B}   % near-black charcoal (chapter bands, parts)
 
 %% ─── Semantic callout colors ─────────────────────────────────────────────────
 \definecolor{bcpNoteBlue}    {HTML}{1565C0}
@@ -65,9 +66,9 @@
 \definecolor{bcpExampleBg}   {HTML}{ECEFF1}
 \definecolor{bcpExampleBorder}{HTML}{B0BEC5}
 
-\definecolor{bcpObjAccent}   {HTML}{1A4980}   % = bcpAccentBase (objectives box)
-\definecolor{bcpObjBg}       {HTML}{E8F0FA}
-\definecolor{bcpObjBorder}   {HTML}{90B4D9}
+\colorlet{bcpObjAccent}                    {bcpAccentBase}   % tracks book accent
+\colorlet{bcpObjBg}                        {bcpAccentLight}  % tracks book accent light
+\definecolor{bcpObjBorder}   {HTML}{E0B94A}                  % warm amber border
 
 \definecolor{bcpSeeAlsoOrange}{HTML}{BF360C}
 \definecolor{bcpSeeAlsoBg}    {HTML}{FBE9E7}

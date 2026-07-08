@@ -55,38 +55,40 @@
 \renewcommand{\maketitle}{%
   \begin{titlepage}%
     \thispagestyle{empty}%
-    %% Top accent band
+    %% ── Deep charcoal upper band (~45 % of the page height) ─────────────────
     \noindent
-    \colorbox{bcpAccent}{%
-      \parbox[t][0.22\textheight][c]{\textwidth}{%
-        \centering
+    {\setlength{\fboxsep}{0pt}%
+    \colorbox{bcpDark}{%
+      \parbox[t][0.45\textheight][t]{\textwidth}{%
+        \vspace{0.7cm}%
+        \hspace{0.5cm}%
+        {\sffamily\fontScaleS\bfseries\color{white!30!bcpDark}%
+          \MakeUppercase{\@bookseries}}%
         \vfill
-        {\sffamily\small\color{white!70!bcpAccent}\MakeUppercase{\@bookseries}}\\[6pt]
-        \vfill
+        \hspace{0.5cm}%
+        {\sffamily\bfseries\fontsize{34pt}{40pt}\selectfont\color{white}%
+          \@booktitle\par}%
+        \vspace{0.6cm}%
       }%
-    }%
-    \vspace{1.5cm}
-    %% Book title
+    }}%
+    %% ── White area below the band ────────────────────────────────────────────
+    \vspace{0.8cm}%
     \begin{flushleft}
-      {\sffamily\bfseries\fontScaleH\color{bcpTextMain}\@booktitle}\\[8pt]
+      \hspace{0.1cm}%
       \ifx\@booksubtitle\empty\else
-        {\sffamily\fontScaleXL\color{bcpTextSecond}\@booksubtitle}\\[8pt]
+        {\sffamily\fontScaleL\color{bcpTextSecond}\@booksubtitle}\\[14pt]
       \fi
     \end{flushleft}
-    %% Accent rule
-    {\color{bcpAccent}\rule{\textwidth}{1.5pt}}
+    {\color{bcpAccent}\rule{\textwidth}{2pt}}%
     \vfill
-    %% Author and edition
     \begin{flushleft}
-      {\sffamily\bfseries\fontScaleL\color{bcpTextMain}\@bookauthor}\\[4pt]
-      {\sffamily\small\color{bcpTextSecond}\@bookedition\ \textbullet\ Version \@bookversion}
+      {\sffamily\bfseries\fontScaleL\color{bcpTextMain}\@bookauthor}\\[6pt]
+      {\sffamily\small\color{bcpTextSecond}%
+        \@bookedition\enspace\textbullet\enspace Version \@bookversion}
     \end{flushleft}
-    %% Bottom thin rule
-    {\color{bcpBorder}\rule{\textwidth}{0.4pt}}
-    \vspace{4pt}
-    \begin{flushleft}
-      {\small\sffamily\color{bcpTextLight}\@bookseries}
-    \end{flushleft}
+    \vspace{0.4cm}%
+    {\color{bcpBorder}\rule{\textwidth}{0.4pt}}\\[4pt]
+    {\small\sffamily\color{bcpTextLight}\@bookseries}%
   \end{titlepage}%
   \cleardoublepage
 }

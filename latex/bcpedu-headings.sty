@@ -24,77 +24,102 @@
 \RequirePackage{needspace}  % prevent floating headings
 
 %% ─── Part pages ──────────────────────────────────────────────────────────────
-%% Full-page divider: accent-color top band, large roman part number, title.
-%% In print mode bcpAccent is dark, so this still works as a strong divider.
+%% Full-page divider: deep charcoal background, white text, vertically centred.
 \titleformat{\part}[display]
-  {\thispagestyle{empty}\pagecolor{bcpAccentLight}\color{bcpAccent}}  % page + text color
   {%
-    \sffamily\fontScaleL\MakeUppercase{\partname}\enspace\thepart
-    \vspace{6pt}%
-    {\color{bcpAccent}\rule{\textwidth}{1.5pt}}%
+    \thispagestyle{empty}%
+    \pagecolor{bcpDark}%
+    \sffamily\bfseries%
+    \color{white}%
   }
+  {%
+    \centering
+    {\color{white!25!bcpDark}\fontScaleL\MakeUppercase{\partname}\enspace}%
+    {\color{white}\fontScaleH\thepart}\\[8pt]%
+    {\color{white!15!bcpDark}\rule{0.35\textwidth}{0.8pt}}%
+  }
+  {20pt}
+  {%
+    \centering
+    \fontScaleXXL\color{white}%
+  }
+  [\vfill\afterpage{\pagecolor{white}}]
+
+\titlespacing*{\part}
   {0pt}
-  {%
-    \sffamily\bfseries\fontScaleH\color{bcpAccentDark}%
-  }
-  [%
-    \vfill
-    \afterpage{\pagecolor{white}}  % restore normal page color after part page
-  ]
+  {\fill}   % push content to vertical centre
+  {0pt}
 
 %% ─── Chapter headings ────────────────────────────────────────────────────────
 %% Layout:
-%%   Line 1: "Chapter N" in small caps gray sans (label)
-%%   Line 2: Title in large bold sans, accent-colored
-%%   Line 3: Full-width accent rule
+%%   Full-width charcoal band: "CHAPTER" label left, large amber number right
+%%   Chapter title in bold sans below the band (white background)
+%%   2 pt accent rule after the title
 %%
 \titleformat{\chapter}[display]
   {\sffamily\bfseries}
   {%
-    % Chapter label: "Chapter N" small, all caps, gray
-    \fontScaleL\color{bcpTextLight}\MakeUppercase{\chaptername}\enspace
-    \color{bcpAccent}\fontScaleH\thechapter
+    % Full-width dark band spanning the text block
+    {\setlength{\fboxsep}{0pt}%
+    \colorbox{bcpDark}{%
+      \parbox[b][2.2cm][c]{\textwidth}{%
+        \hspace{0.5cm}%
+        {\color{white!30!bcpDark}\fontScaleL\bfseries\MakeUppercase{\chaptername}}%
+        \hfill
+        {\color{bcpAccentMid}\fontsize{52pt}{52pt}\selectfont\bfseries\thechapter}%
+        \hspace{0.5cm}%
+      }%
+    }}%
   }
-  {12pt}
+  {18pt}
   {%
-    % Chapter title
-    \fontScaleXXL\color{bcpTextMain}%
+    \fontsize{26pt}{32pt}\selectfont\color{bcpTextMain}%
   }
   [%
-    % Decorative rule below the title
-    \vspace{4pt}%
-    {\color{bcpAccent}\rule{\textwidth}{1.5pt}}%
-    \vspace{16pt}%
+    \vspace{8pt}%
+    {\color{bcpAccent}\rule{\textwidth}{2pt}}%
+    \vspace{22pt}%
   ]
 
-%% Chapter spacing: top space (from top of text block), before/after spacing
+%% Band sits right at the top of the text area; after-code controls spacing below
 \titlespacing*{\chapter}
-  {0pt}       % left indent
-  {0pt}       % space above (distance from top margin to label)
-  {28pt}      % space below (between rule and first paragraph)
+  {0pt}   % left indent
+  {0pt}   % space above
+  {0pt}   % after (after-code vspace handles it)
 
 %% ─── Section ─────────────────────────────────────────────────────────────────
-%% Bold sans, accent numeral, full-width light rule below
+%% Bold sans, 3 pt accent left-bar (via \llap into margin), accent numeral
 \titleformat{\section}
   {\needspace{4\baselineskip}\sffamily\bfseries\fontScaleXL\color{bcpTextMain}}
-  {\textcolor{bcpAccent}{\thesection}\enspace}
+  {%
+    \llap{%
+      \color{bcpAccent}\rule[-2pt]{3pt}{1.1em}%
+      \hspace{7pt}%
+    }%
+    \textcolor{bcpAccent}{\thesection}\enspace
+  }
   {0pt}
   {}
-  [{\color{bcpBorder}\vspace{2pt}\rule{\textwidth}{0.4pt}\vspace{2pt}}]
 
 \titlespacing*{\section}
-  {0pt}{18pt plus 4pt minus 2pt}{8pt plus 2pt}
+  {0pt}{22pt plus 4pt minus 2pt}{9pt plus 2pt}
 
 %% ─── Subsection ──────────────────────────────────────────────────────────────
-%% Bold sans, dark gray numeral, no rule
+%% Bold sans, 2 pt accent-mid left-bar, accent-mid numeral
 \titleformat{\subsection}
   {\needspace{3\baselineskip}\sffamily\bfseries\fontScaleL\color{bcpTextMain}}
-  {\textcolor{bcpAccentMid}{\thesubsection}\enspace}
+  {%
+    \llap{%
+      \color{bcpAccentMid}\rule[-2pt]{2pt}{0.95em}%
+      \hspace{7pt}%
+    }%
+    \textcolor{bcpAccentMid}{\thesubsection}\enspace
+  }
   {0pt}
   {}
 
 \titlespacing*{\subsection}
-  {0pt}{14pt plus 3pt minus 2pt}{5pt plus 1pt}
+  {0pt}{16pt plus 3pt minus 2pt}{6pt plus 1pt}
 
 %% ─── Subsubsection ───────────────────────────────────────────────────────────
 %% Bold sans, no number displayed in text (but numbered internally for ToC)
@@ -131,13 +156,14 @@
   {}
   {}
 
-%% Chapter: bold sans, dot leaders, page number
+%% Chapter: bold sans, bold accent page number, subtle separator rule
 \titlecontents{chapter}
   [0em]
-  {\addvspace{6pt}\sffamily\bfseries\normalsize}
+  {\addvspace{8pt}\sffamily\bfseries\normalsize}
   {\makebox[2.2em][l]{\textcolor{bcpAccent}{\thecontentslabel}}}
   {}
-  {\hfill\textcolor{bcpTextLight}{\contentspage}}
+  {\hfill\textbf{\textcolor{bcpAccent}{\contentspage}}}
+  [\vspace{3pt}{\color{bcpBorder}\hrule height 0.4pt}\vspace{1pt}]
 
 %% Section: regular sans, indented, dot leaders
 \titlecontents{section}

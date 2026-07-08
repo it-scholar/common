@@ -41,31 +41,27 @@
 %% Define the 'bcpedu' page style
 \fancypagestyle{bcpedu}{%
   \fancyhf{}  % clear all fields
-  %% Outer header: chapter/section name in small sans-serif caps
-  %% Even pages (left): page number | chapter name
+  %% Even pages (left): page number — chapter name
   \fancyhead[LE]{%
-    \small\sffamily\textcolor{bcpTextLight}{\thepage}%
-    \quad%
-    \textcolor{bcpBorder}{\rule[-0.15ex]{0.5pt}{1.5ex}}%
-    \quad%
+    \small\sffamily%
+    \textbf{\textcolor{bcpAccent}{\thepage}}%
+    \enspace\textcolor{bcpBorder}{\textemdash}\enspace%
     \textcolor{bcpTextSecond}{\nouppercase{\leftmark}}%
   }
-  %% Odd pages (right): section name | page number
+  %% Odd pages (right): section name — page number
   \fancyhead[RO]{%
     \small\sffamily%
     \textcolor{bcpTextSecond}{\nouppercase{\rightmark}}%
-    \quad%
-    \textcolor{bcpBorder}{\rule[-0.15ex]{0.5pt}{1.5ex}}%
-    \quad%
-    \textcolor{bcpTextLight}{\thepage}%
+    \enspace\textcolor{bcpBorder}{\textemdash}\enspace%
+    \textbf{\textcolor{bcpAccent}{\thepage}}%
   }
-  %% Footer: series name centered, accent-colored thin rule above
+  %% Footer: series name centered, thin border rule above
   \fancyfoot[C]{%
     \color{bcpBorder}\rule{\textwidth}{0.4pt}\\[2pt]
     \small\sffamily\textcolor{bcpTextLight}{\@bookseries}%
   }
-  %% Header rule: thin accent-colored line
-  \renewcommand{\headrulewidth}{0pt}  % we draw our own rule via colors
+  %% Accent-coloured head rule
+  \renewcommand{\headrulewidth}{0.6pt}
   \renewcommand{\footrulewidth}{0pt}
 }
 
@@ -89,6 +85,11 @@
 
 %% Apply the bcpedu page style globally
 \pagestyle{bcpedu}
+
+%% Accent-coloured head rule (applied via headrulewidth set in bcpedu pagestyle)
+%% Note: \@height and \@width are LaTeX kernel macros for the TeX keywords
+%% "height" and "width"; @ is already a letter inside .sty files.
+\def\headrule{{\color{bcpAccent}\hrule \@height \headrulewidth \@width \headwidth \vskip-\headrulewidth}}
 
 %% ─── Mark format ─────────────────────────────────────────────────────────────
 %% \chaptermark and \sectionmark set \leftmark and \rightmark.
