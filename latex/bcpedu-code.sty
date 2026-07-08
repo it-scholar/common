@@ -92,7 +92,10 @@
   listing engine  = minted,
   listing only,
   minted language = {#1},
-  minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4, breaklines=true},
+  %% xleftmargin shifts code right so line numbers sit inside the box frame.
+  %% numbersep controls the gap between the number and the code text.
+  minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4,
+                     breaklines=true, xleftmargin=2em, numbersep=8pt},
   colback         = bcpCodeBg,
   colframe        = bcpCodeBorder,
   coltitle        = bcpTextMain,
