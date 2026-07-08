@@ -127,6 +127,11 @@
 %% ─── Column separation (for multi-column sections, e.g. index) ───────────────
 \setlength{\columnsep}{1.5em}
 \setlength{\columnseprule}{0.4pt}
-\renewcommand{\columnseprulecolor}{\color{bcpBorder}}
+%% \columnseprulecolor is a multicol package command; set it only when available.
+\AtBeginDocument{%
+  \@ifpackageloaded{multicol}{%
+    \renewcommand{\columnseprulecolor}{\color{bcpBorder}}%
+  }{}%
+}
 
 \endinput

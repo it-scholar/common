@@ -52,7 +52,7 @@ LATEXMK_FLAGS := \
   -halt-on-error \
   -file-line-error \
   -bibtex \
-  -use-make
+  -r $(COMMON_DIR)latexmkrc
 
 # Index style file: copy from common to build dir so imakeidx finds it
 IST_SRC  := $(COMMON_DIR)bcpedu-index.ist

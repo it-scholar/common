@@ -27,6 +27,7 @@
 
 \RequirePackage{afterpage}
 \RequirePackage{geometry}   % for temporary margin changes on title page
+\RequirePackage{hologo}     % \hologo{XeLaTeX}, \hologo{LuaLaTeX}, etc.
 
 %% ─── Half-title page ─────────────────────────────────────────────────────────
 %% A traditional opening page with just the book title, before the full title page.
@@ -109,7 +110,7 @@
     \small\color{bcpTextSecond}
     \bcpcopyrighttext
     \par\vspace{12pt}
-    \textit{Typeset with \XeLaTeX\ and the \texttt{bcpedu} document class.}
+    \textit{Typeset with \hologo{XeLaTeX} and the \texttt{bcpedu} document class.}
   \end{flushleft}
   \cleardoublepage
 }

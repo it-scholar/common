@@ -1,3 +1,75 @@
-/assets/mermaid/*.svg
+# =============================================================================
+# common — BCP Education shared build tooling
+# =============================================================================
+
+# ── Node.js ──────────────────────────────────────────────────────────────────
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+
+# ── Mermaid build output ──────────────────────────────────────────────────────
+# SVG files are generated from .mmd source; commit .mmd, not .svg
+assets/mermaid/*.svg
+
+# ── LaTeX build artifacts ────────────────────────────────────────────────────
+# Auxiliary files produced during compilation
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.lol
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.xdv
+
+# Bibliography
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+*.bcf-SAVE-ERROR
+*.bbl-SAVE-ERROR
+
+# Index
+*.idx
+*.ilg
+*.ind
+*.ist
+
+# Glossary
+*.glo
+*.gls
+*.glg
+*.acn
+*.acr
+*.alg
+
+# minted syntax-highlighting cache
+_minted/
+_minted-*/
+*.listing
+*.minted
+
+# svg-inkscape temp files
+svg-inkscape/
+
+# PDF build outputs (generated; do not commit)
+*.pdf
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# ── Editor / IDE ─────────────────────────────────────────────────────────────
+.vscode/
+*.swp
+*.swo
+*~
+.idea/

@@ -1,0 +1,31 @@
+# latexmkrc — Custom dependency rules for BCP Education books
+# This file is included by Makefile.common via the -r flag.
+# It teaches latexmk how to run makeglossaries automatically.
+
+# ── Glossaries (glossaries-extra) ─────────────────────────────────────────────
+# .glo → .gls  (main glossary)
+# .acn → .acr  (acronym list)
+# latexmk passes the base filename (no extension) as $_[0].
+add_cus_dep('glo', 'gls', 0, 'run_makeglossaries');
+add_cus_dep('acn', 'acr', 0, 'run_makeglossaries');
+
+sub run_makeglossaries {
+    if ( $silent ) {
+        return system("makeglossaries -q '$_[0]'");
+    } else {
+        return system("makeglossaries '$_[0]'");
+    }
+}
+
+# ── Index (imakeidx) ──────────────────────────────────────────────────────────
+# imakeidx calls makeindex via \write18 (shell-escape) during the LaTeX run,
+# so latexmk handles the .idx → .ind dependency natively.
+# No custom dep needed here — latexmk's built-in makeindex rule is sufficient.
+
+# ── Biber / biblatex ──────────────────────────────────────────────────────────
+# Handled natively by latexmk when -bibtex flag is used.
+
+# ── Output directory (if using -outdir) ───────────────────────────────────────
+# Uncomment if you want build artifacts in a separate directory:
+# $out_dir = 'build';
+

@@ -42,26 +42,18 @@
 \tcbuselibrary{minted,skins,breakable,listings}
 \RequirePackage{minted}
 
-%% ─── Pygments minted styles ──────────────────────────────────────────────────
-%% Digital: Dracula-inspired dark style via 'dracula' Pygments style (or 'native')
-%% Print:   'friendly' style (light background, works well in gray)
-%%
-%% The minted 'style' is set per-environment using the \if@bcpprint flag
-%% exposed by bcpedu-colors. We set a global default and allow override.
-%%
-\newcommand{\bcpMintedStyle}{dracula}
+%% ─── Pygments styles ─────────────────────────────────────────────────────────
+%% Light code blocks: 'friendly' (built-in, good for print + digital)
+%% Dark terminal blocks: 'monokai' (built-in, dark background)
+%% To override per-book: redefine \bcpMintedStyleLight / \bcpMintedStyleDark
 \newcommand{\bcpMintedStyleLight}{friendly}
+\newcommand{\bcpMintedStyleDark}{monokai}
 
-%% Set minted global options
+%% Global minted defaults
 \setminted{
-  breaklines       = true,
-  breakanywhere    = false,
-  breaksymbol      = \tiny\color{bcpTextLight}\ensuremath{\hookrightarrow},
-  fontsize         = \small,
-  tabsize          = 4,
-  linenos          = true,
-  numbersep        = 8pt,
-  xleftmargin      = 2pt,
+  breaklines = true,
+  fontsize   = \small,
+  tabsize    = 4,
 }
 
 %% ─── tcolorbox base styles ───────────────────────────────────────────────────
@@ -69,158 +61,116 @@
   bcpCodeBase/.style = {
     enhanced,
     breakable,
-    arc           = 4pt,
-    boxrule       = 0.6pt,
-    left          = 8pt,
-    right         = 8pt,
-    top           = 6pt,
-    bottom        = 6pt,
-    fontupper     = \small\ttfamily,
-    before skip   = 10pt plus 3pt,
-    after skip    = 10pt plus 3pt,
+    arc         = 4pt,
+    boxrule     = 0.6pt,
+    left        = 8pt,
+    right       = 8pt,
+    top         = 6pt,
+    bottom      = 6pt,
+    before skip = 10pt plus 3pt,
+    after skip  = 10pt plus 3pt,
   },
-  %% Header bar style (used by codefile and terminalin/out)
   bcpCodeHeader/.style = {
     attach boxed title to top left = {yshift=-\tcboxedtitleheight+1pt, xshift=12pt},
     boxed title style = {
       enhanced,
-      arc         = 2pt,
-      boxrule     = 0.5pt,
-      top         = 2pt,
-      bottom      = 2pt,
-      left        = 6pt,
-      right       = 6pt,
+      arc     = 2pt,
+      boxrule = 0.5pt,
+      top=2pt, bottom=2pt, left=6pt, right=6pt,
     },
   },
 }
 
 %% ─── Environment 1: codefile ─────────────────────────────────────────────────
+%% \newtcblisting creates a verbatim-collecting environment (unlike \newenvironment).
+%% Arguments: #1 = language (optional, default: text), #2 = filename (required)
+%%
 %% Usage: \begin{codefile}[bash]{/etc/nginx/nginx.conf}
-%%          ...code...
+%%          server { listen 80; }
 %%        \end{codefile}
 %%
-%% Optional minted options: [language, firstline=N, lastline=M, highlightlines={2,4}]
-%%
-\newenvironment{codefile}[2][text]{%
-  \def\bcpFileLang{#1}%
-  \def\bcpFileName{#2}%
-  \begin{tcolorbox}[
-    bcpCodeBase,
-    bcpCodeHeader,
-    colback       = bcpCodeBg,
-    colframe      = bcpCodeBorder,
-    coltitle      = bcpTextMain,
-    colbacktitle  = bcpCodeBorder,
-    title         = {\ttfamily\small\textcolor{bcpAccent}{\faFile*[regular]\enspace}\textbf{\bcpFileName}%
-                     \hfill\textcolor{bcpTextLight}{\scriptsize\MakeUppercase{\bcpFileLang}}},
-  ]%
-  \begin{minted}[
-    style         = \bcpMintedStyleLight,
-    bgcolor       = bcpCodeBg,
-    linenos       = true,
-    numbersep     = 8pt,
-    fontsize      = \small,
-  ]{\bcpFileLang}%
-}{%
-  \end{minted}%
-  \end{tcolorbox}%
+\newtcblisting{codefile}[2][text]{
+  bcpCodeBase,
+  bcpCodeHeader,
+  listing engine  = minted,
+  listing only,
+  minted language = {#1},
+  minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4, breaklines=true},
+  colback         = bcpCodeBg,
+  colframe        = bcpCodeBorder,
+  coltitle        = bcpTextMain,
+  colbacktitle    = bcpCodeBorder,
+  title           = {\ttfamily\small
+                     \textcolor{bcpAccent}{\faFile*[regular]\enspace}%
+                     \textbf{#2}%
+                     \hfill\textcolor{bcpTextLight}{\scriptsize\MakeUppercase{#1}}},
 }
 
 %% ─── Environment 2: codeblock ────────────────────────────────────────────────
+%% #1 = language (optional, default: text)
+%%
 %% Usage: \begin{codeblock}[yaml]
-%%          ...
+%%          apiVersion: v1
 %%        \end{codeblock}
 %%
-\newenvironment{codeblock}[1][text]{%
-  \def\bcpLang{#1}%
-  \begin{tcolorbox}[
-    bcpCodeBase,
-    colback       = bcpCodeBg,
-    colframe      = bcpCodeBorder,
-    title         = {\textcolor{bcpTextLight}{\scriptsize\sffamily\MakeUppercase{#1}}},
-    detach title,
-    before upper  = {\tcbtitle\vspace{4pt}},
-  ]%
-  \begin{minted}[
-    style         = \bcpMintedStyleLight,
-    bgcolor       = bcpCodeBg,
-    linenos       = true,
-    fontsize      = \small,
-  ]{\bcpLang}%
-}{%
-  \end{minted}%
-  \end{tcolorbox}%
+\newtcblisting{codeblock}[1][text]{
+  bcpCodeBase,
+  bcpCodeHeader,
+  listing engine  = minted,
+  listing only,
+  minted language = {#1},
+  minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4, breaklines=true},
+  colback         = bcpCodeBg,
+  colframe        = bcpCodeBorder,
+  coltitle        = bcpTextLight,
+  colbacktitle    = bcpCodeBg,
+  title           = {\scriptsize\sffamily\MakeUppercase{#1}},
 }
 
 %% ─── Environment 3: terminalin ───────────────────────────────────────────────
-%% Dark-background shell input block.
-%% Lines starting with $ are styled as prompts; other lines continue input.
+%% #1 = optional label (default: empty)
 %%
-%% Usage: \begin{terminalin}[Optional label]
-%%          $ kubectl get pods -n default
-%%          $ kubectl describe pod my-pod
+%% Usage: \begin{terminalin}[My Server]
+%%          $ kubectl get pods
 %%        \end{terminalin}
 %%
-\newenvironment{terminalin}[1][]{%
-  \def\bcpTermLabel{#1}%
-  \begin{tcolorbox}[
-    bcpCodeBase,
-    bcpCodeHeader,
-    colback       = bcpTermInBg,
-    colframe      = bcpAccentDark,
-    coltitle      = bcpTermInFg,
-    colbacktitle  = bcpAccentDark,
-    fontupper     = \small\ttfamily\color{bcpTermInFg},
-    title         = {%
-      \textcolor{bcpTermInPrompt}{\small\faTerminal}\enspace
-      \textbf{\textcolor{bcpTermInFg}{Terminal}}%
-      \ifx\bcpTermLabel\empty\else\enspace\textcolor{bcpTermInFg!50!bcpAccentDark}{---\enspace\bcpTermLabel}\fi
-    },
-  ]%
-  \begin{minted}[
-    style         = dracula,
-    bgcolor       = bcpTermInBg,
-    linenos       = false,
-    fontsize      = \small,
-  ]{bash}%
-}{%
-  \end{minted}%
-  \end{tcolorbox}%
+\newtcblisting{terminalin}[1][]{
+  bcpCodeBase,
+  bcpCodeHeader,
+  listing engine  = minted,
+  listing only,
+  minted language = bash,
+  minted options  = {style=monokai, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
+  colback         = bcpTermInBg,
+  colframe        = bcpAccentDark,
+  coltitle        = bcpTermInFg,
+  colbacktitle    = bcpAccentDark,
+  title           = {\textcolor{bcpTermInPrompt}{\small\faTerminal}\enspace
+                     \textbf{\textcolor{bcpTermInFg}{Terminal}}%
+                     \ifblank{#1}{}{\enspace\textcolor{bcpTermInFg!50!bcpAccentDark}{---\enspace#1}}},
 }
 
 %% ─── Environment 4: terminalout ──────────────────────────────────────────────
-%% Terminal output — slightly lighter than input, no prompt styling.
+%% #1 = optional label (default: empty)
 %%
-%% Usage: \begin{terminalout}[Optional label]
-%%          NAME    READY  STATUS   RESTARTS  AGE
-%%          my-pod  1/1    Running  0         5d
+%% Usage: \begin{terminalout}[kubectl output]
+%%          NAME      READY   STATUS
 %%        \end{terminalout}
 %%
-\newenvironment{terminalout}[1][]{%
-  \def\bcpOutLabel{#1}%
-  \begin{tcolorbox}[
-    bcpCodeBase,
-    bcpCodeHeader,
-    colback       = bcpTermOutBg,
-    colframe      = bcpMidGray,
-    coltitle      = bcpTermOutFg,
-    colbacktitle  = bcpMidGray,
-    fontupper     = \small\ttfamily\color{bcpTermOutFg},
-    title         = {%
-      \textcolor{bcpTermInPrompt!80!white}{\small\faAngleRight\faAngleRight}\enspace
-      \textbf{\textcolor{bcpTermOutFg}{Output}}%
-      \ifx\bcpOutLabel\empty\else\enspace\textcolor{bcpTermOutFg!60!bcpMidGray}{---\enspace\bcpOutLabel}\fi
-    },
-  ]%
-  \begin{minted}[
-    style         = monokai,
-    bgcolor       = bcpTermOutBg,
-    linenos       = false,
-    fontsize      = \small,
-  ]{text}%
-}{%
-  \end{minted}%
-  \end{tcolorbox}%
+\newtcblisting{terminalout}[1][]{
+  bcpCodeBase,
+  bcpCodeHeader,
+  listing engine  = minted,
+  listing only,
+  minted language = text,
+  minted options  = {style=monokai, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
+  colback         = bcpTermOutBg,
+  colframe        = bcpMidGray,
+  coltitle        = bcpTermOutFg,
+  colbacktitle    = bcpMidGray,
+  title           = {\textcolor{bcpTermInPrompt!80!white}{\small\faAngleRight\faAngleRight}\enspace
+                     \textbf{\textcolor{bcpTermOutFg}{Output}}%
+                     \ifblank{#1}{}{\enspace\textcolor{bcpTermOutFg!60!bcpMidGray}{---\enspace#1}}},
 }
 
 %% ─── Inline semantic commands ────────────────────────────────────────────────

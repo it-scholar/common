@@ -21,36 +21,25 @@
 
 %% Body font: IBM Plex Serif
 %% Excellent legibility at 11pt, strong italic, clear bold
+%% fontspec auto-detects Bold, Italic, BoldItalic from the installed family.
 \setmainfont{IBM Plex Serif}[
-  UprightFont    = *-Regular,
-  BoldFont       = *-Bold,
-  ItalicFont     = *-Italic,
-  BoldItalicFont = *-BoldItalic,
-  Numbers        = {OldStyle, Proportional},
-  Ligatures      = TeX,
+  Numbers   = {OldStyle, Proportional},
+  Ligatures = TeX,
 ]
 
 %% Sans-serif: IBM Plex Sans
 %% Used for headings, callout titles, running headers, captions
 \setsansfont{IBM Plex Sans}[
-  UprightFont    = *-Regular,
-  BoldFont       = *-Bold,
-  ItalicFont     = *-Italic,
-  BoldItalicFont = *-BoldItalic,
-  Numbers        = {Lining, Proportional},
-  Ligatures      = TeX,
+  Numbers   = {Lining, Proportional},
+  Ligatures = TeX,
 ]
 
 %% Monospace: JetBrains Mono
 %% All code, terminal, inline \code{} — ligature-rich, clear at small sizes
 \setmonofont{JetBrains Mono}[
-  UprightFont    = *-Regular,
-  BoldFont       = *-Bold,
-  ItalicFont     = *-Italic,
-  BoldItalicFont = *-BoldItalic,
-  Scale          = 0.88,        % slightly smaller than body for visual harmony
-  Ligatures      = TeX,
-  Contextuals    = Alternate,   % enables programming ligatures (-> => etc.)
+  Scale       = 0.88,        % slightly smaller than body for visual harmony
+  Ligatures   = TeX,
+  Contextuals = Alternate,   % enables programming ligatures (-> => etc.)
 ]
 
 %% ─── Math font ───────────────────────────────────────────────────────────────
@@ -62,16 +51,12 @@
 ]
 
 %% ─── Microtype ───────────────────────────────────────────────────────────────
-%% Enables character protrusion, font expansion, and kerning.
-%% Reduces overfull hboxes significantly in technical text.
+%% With XeLaTeX, microtype supports protrusion and tracking.
+%% expansion/spacing/kerning are pdfTeX-only; omitting them avoids errors.
 \RequirePackage[
   final,
-  tracking  = true,
-  kerning   = true,
-  spacing   = true,
-  factor    = 1100,
-  stretch   = 10,
-  shrink    = 10,
+  protrusion = true,
+  tracking   = true,
 ]{microtype}
 
 %% ─── Line spacing ────────────────────────────────────────────────────────────

@@ -53,10 +53,13 @@
 %% ─── Glossary with glossaries-extra ──────────────────────────────────────────
 \RequirePackage[
   toc,
-  automake,
   stylemods = {mcols},
   style     = mcolindex,   % two-column alphabetical list
 ]{glossaries-extra}
+
+%% Must be called in the preamble to initialise glossary output files.
+%% latexmkrc handles running makeglossaries automatically.
+\makeglossaries
 
 %% \term{keyword} — inline use; prints keyword in text AND adds to glossary.
 %% If the term has a glossary entry (\newglossaryentry), it links there.
