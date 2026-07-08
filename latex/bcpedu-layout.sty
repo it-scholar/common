@@ -86,20 +86,15 @@
 %% Apply the bcpedu page style globally
 \pagestyle{bcpedu}
 
-%% Accent-coloured head rule (applied via headrulewidth set in bcpedu pagestyle)
-%% Note: \@height and \@width are LaTeX kernel macros for the TeX keywords
-%% "height" and "width"; @ is already a letter inside .sty files.
-\def\headrule{{\color{bcpAccent}\hrule \@height \headrulewidth \@width \headwidth \vskip-\headrulewidth}}
+%% Nearly-invisible head rule — matches business plan (black!12)
+%% Defined here after \pagestyle so fancyhdr internals are initialised.
+\def\headrule{{\color{black!12}\hrule \@height \headrulewidth \@width \headwidth \vskip-\headrulewidth}}
 
 %% ─── Mark format ─────────────────────────────────────────────────────────────
-%% \chaptermark and \sectionmark set \leftmark and \rightmark.
-%% We want: CHAPTER N — Chapter Title   |   Section Title
-\renewcommand{\chaptermark}[1]{%
-  \markboth{\chaptername\ \thechapter\ \textemdash\ #1}{#1}%
-}
-\renewcommand{\sectionmark}[1]{%
-  \markright{#1}%
-}
+%% Just chapter/section title in the mark — no "Chapter N —" prefix.
+%% The \MakeUppercase in the header already handles case.
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
 
 %% ─── Clean double-page-clear ─────────────────────────────────────────────────
 %% Insert a truly blank page (no headers/footers) when forcing chapter to recto.

@@ -1,103 +1,97 @@
 %% =============================================================================
 %% bcpedu-headings.sty — Chapter, Section, and Part Heading Styles
 %% =============================================================================
-%% Uses titlesec to style all structural heading levels.
+%% Design: Editorial Minimalism — follows BCP corporate design language.
 %%
-%% Design:
-%%   \part       — full-page color divider with large number + title
-%%   \chapter    — large accent-colored number, bold sans title, accent rule below
-%%   \section    — bold sans, accent-colored numeral, small rule
-%%   \subsection — bold sans, dark gray
-%%   \subsubsection — italic sans, gray
+%%   \part       — white page, ghost number (TikZ), gold square + label, big title
+%%   \chapter    — white page, ghost number (TikZ), gold square + "CHAPTER N" label,
+%%                 hairline rule, bold title 28pt
+%%   \section    — gold filled square + number, generous spacing, no rule
+%%   \subsection — gray filled square + number
+%%   \subsubsection — small gray square + number, lighter text
 %%   \paragraph  — bold sans inline
 %%
-%% The chapter opening page is always on the right (recto) — enforced by `openright`
-%% in the class. The titlesec `display` format provides a visually strong chapter
-%% opener suitable for a 300-1000 page technical book.
+%% All structural decoration uses a single gold color (bcpAccent).
+%% No background bands, no underrules on sections. White space does the work.
 %% =============================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{bcpedu-headings}[2026/07/08 v1.0 BCP Education Heading Styles]
+\ProvidesPackage{bcpedu-headings}[2026/07/08 v2.0 BCP Education Heading Styles]
 
 \RequirePackage{titlesec}
 \RequirePackage{titletoc}   % ToC entry styling
 \RequirePackage{needspace}  % prevent floating headings
 
+%% ─── Reusable decoration macros ──────────────────────────────────────────────
+%% Gold filled square (matches business plan \goldsq)
+\newcommand{\bcpGoldSq}{\raisebox{0.18em}{\textcolor{bcpAccent}{\rule{0.42em}{0.42em}}}}
+%% Gray filled square for sub-levels
+\newcommand{\bcpGraySq}{\raisebox{0.15em}{\textcolor{black!28}{\rule{0.32em}{0.32em}}}}
+
 %% ─── Part pages ──────────────────────────────────────────────────────────────
-%% Full-page divider: deep charcoal background, white text, vertically centred.
+%% White page, ghost part number via TikZ overlay, gold square label, big title.
 \titleformat{\part}[display]
+  {\thispagestyle{empty}\sffamily\bfseries}
   {%
-    \thispagestyle{empty}%
-    \pagecolor{bcpDark}%
-    \sffamily\bfseries%
-    \color{white}%
+    %% Ghost part number — bottom-right, nearly invisible
+    \begin{tikzpicture}[overlay, remember picture]
+      \node[
+        anchor = south east,
+        xshift = -1.8cm, yshift = 2.0cm,
+        font   = \fontsize{200}{200}\selectfont\sffamily\bfseries\color{black!5},
+      ] at (current page.south east) {\thepart};
+    \end{tikzpicture}%
+    %% Gold square + "PART N" label
+    \bcpGoldSq\enspace
+    {\footnotesize\sffamily\color{bcpTextLight}%
+      \MakeUppercase{\partname}\enspace\thepart}%
+    \\[0.5em]%
+    %% Hairline separator
+    {\color{black!12}\rule{\linewidth}{0.4pt}}%
   }
-  {%
-    \centering
-    {\color{white!25!bcpDark}\fontScaleL\MakeUppercase{\partname}\enspace}%
-    {\color{white}\fontScaleH\thepart}\\[8pt]%
-    {\color{white!15!bcpDark}\rule{0.35\textwidth}{0.8pt}}%
-  }
-  {20pt}
-  {%
-    \centering
-    \fontScaleXXL\color{white}%
-  }
-  [\vfill\afterpage{\pagecolor{white}}]
+  {1.2em}
+  {\fontsize{42pt}{48pt}\selectfont\color{bcpTextMain}}
 
 \titlespacing*{\part}
-  {0pt}
-  {\fill}   % push content to vertical centre
-  {0pt}
+  {0pt}   % left indent
+  {3.5cm} % top space before label
+  {0pt}   % after (no extra after-code space needed)
 
 %% ─── Chapter headings ────────────────────────────────────────────────────────
-%% Layout:
-%%   Full-width charcoal band: "CHAPTER" label left, large amber number right
-%%   Chapter title in bold sans below the band (white background)
-%%   2 pt accent rule after the title
-%%
+%% White page, ghost chapter number (TikZ), gold square + label, hairline, title.
 \titleformat{\chapter}[display]
-  {\sffamily\bfseries}
+  {\sffamily}
   {%
-    % Full-width dark band spanning the text block
-    {\setlength{\fboxsep}{0pt}%
-    \colorbox{bcpDark}{%
-      \parbox[b][2.2cm][c]{\textwidth}{%
-        \hspace{0.5cm}%
-        {\color{white!30!bcpDark}\fontScaleL\bfseries\MakeUppercase{\chaptername}}%
-        \hfill
-        {\color{bcpAccentMid}\fontsize{52pt}{52pt}\selectfont\bfseries\thechapter}%
-        \hspace{0.5cm}%
-      }%
-    }}%
+    %% Ghost chapter number — bottom-right corner, very pale
+    \begin{tikzpicture}[overlay, remember picture]
+      \node[
+        anchor = south east,
+        xshift = -1.8cm, yshift = 2.0cm,
+        font   = \fontsize{160}{160}\selectfont\sffamily\bfseries\color{black!5},
+      ] at (current page.south east) {\thechapter};
+    \end{tikzpicture}%
+    %% Gold square + "CHAPTER N" label — tiny, gray, uppercase
+    \bcpGoldSq\enspace
+    {\footnotesize\sffamily\color{bcpTextLight}%
+      \MakeUppercase{\chaptername}\enspace\thechapter}%
+    \\[0.5em]%
+    %% Hairline separator rule (matches business plan \chapterlinesformat)
+    {\color{black!12}\rule{\linewidth}{0.4pt}}%
   }
-  {18pt}
-  {%
-    \fontsize{26pt}{32pt}\selectfont\color{bcpTextMain}%
-  }
-  [%
-    \vspace{8pt}%
-    {\color{bcpAccent}\rule{\textwidth}{2pt}}%
-    \vspace{22pt}%
-  ]
+  {1.2em}
+  {\bfseries\fontsize{28pt}{34pt}\selectfont\color{bcpTextMain}}
+  [\vspace{2.0cm}]
 
-%% Band sits right at the top of the text area; after-code controls spacing below
 \titlespacing*{\chapter}
   {0pt}   % left indent
-  {0pt}   % space above
-  {0pt}   % after (after-code vspace handles it)
+  {3.5cm} % top space before label (matches \vspace*{3.5cm} in business plan)
+  {0pt}   % after (after-code \vspace{2.0cm} handles paragraph gap)
 
 %% ─── Section ─────────────────────────────────────────────────────────────────
-%% Bold sans, 3 pt accent left-bar (via \llap into margin), accent numeral
+%% Gold square + number, bold sans. No rule. Space alone creates hierarchy.
 \titleformat{\section}
   {\needspace{4\baselineskip}\sffamily\bfseries\fontScaleXL\color{bcpTextMain}}
-  {%
-    \llap{%
-      \color{bcpAccent}\rule[-2pt]{3pt}{1.1em}%
-      \hspace{7pt}%
-    }%
-    \textcolor{bcpAccent}{\thesection}\enspace
-  }
+  {\bcpGoldSq\enspace\thesection\enspace}
   {0pt}
   {}
 
@@ -105,16 +99,10 @@
   {0pt}{22pt plus 4pt minus 2pt}{9pt plus 2pt}
 
 %% ─── Subsection ──────────────────────────────────────────────────────────────
-%% Bold sans, 2 pt accent-mid left-bar, accent-mid numeral
+%% Gray square + number, bold sans, slightly smaller.
 \titleformat{\subsection}
   {\needspace{3\baselineskip}\sffamily\bfseries\fontScaleL\color{bcpTextMain}}
-  {%
-    \llap{%
-      \color{bcpAccentMid}\rule[-2pt]{2pt}{0.95em}%
-      \hspace{7pt}%
-    }%
-    \textcolor{bcpAccentMid}{\thesubsection}\enspace
-  }
+  {\bcpGraySq\enspace\thesubsection\enspace}
   {0pt}
   {}
 
@@ -122,15 +110,15 @@
   {0pt}{16pt plus 3pt minus 2pt}{6pt plus 1pt}
 
 %% ─── Subsubsection ───────────────────────────────────────────────────────────
-%% Bold sans, no number displayed in text (but numbered internally for ToC)
+%% Tiny gray square + number, lighter text weight.
 \titleformat{\subsubsection}
-  {\needspace{2\baselineskip}\sffamily\bfseries\normalsize\color{bcpDarkGray}}
-  {\textcolor{bcpTextLight}{\thesubsubsection}\enspace}
+  {\needspace{2\baselineskip}\sffamily\bfseries\normalsize\color{bcpTextSecond}}
+  {{\raisebox{0.12em}{\textcolor{black!20}{\rule{0.26em}{0.26em}}}}\enspace\thesubsubsection\enspace}
   {0pt}
   {}
 
 \titlespacing*{\subsubsection}
-  {0pt}{10pt plus 2pt minus 1pt}{4pt}
+  {0pt}{12pt plus 2pt minus 1pt}{4pt}
 
 %% ─── Paragraph and subparagraph ──────────────────────────────────────────────
 \titleformat{\paragraph}[runin]
@@ -148,45 +136,43 @@
   [.\enspace]
 
 %% ─── Table of Contents entry formatting ──────────────────────────────────────
-%% Part: bold, full width, accent color
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+%% Part: gold square + part name, large bold
 \titlecontents{part}
   [0em]
-  {\addvspace{12pt}\sffamily\bfseries\fontScaleL\color{bcpAccent}}
-  {\partname\enspace\thecontentslabel\quad}
+  {\addvspace{12pt}\sffamily\bfseries\fontScaleL}
+  {\bcpGoldSq\enspace\partname\enspace\thecontentslabel\quad}
   {}
   {}
 
-%% Chapter: bold sans, bold accent page number, subtle separator rule
+%% Chapter: gold square + number, bold, page number right, hairline below
 \titlecontents{chapter}
   [0em]
   {\addvspace{8pt}\sffamily\bfseries\normalsize}
-  {\makebox[2.2em][l]{\textcolor{bcpAccent}{\thecontentslabel}}}
+  {\bcpGoldSq\enspace\makebox[1.8em][l]{\thecontentslabel}}
   {}
-  {\hfill\textbf{\textcolor{bcpAccent}{\contentspage}}}
-  [\vspace{3pt}{\color{bcpBorder}\hrule height 0.4pt}\vspace{1pt}]
+  {\hfill\textbf{\contentspage}}
+  [\vspace{3pt}{\color{black!10}\hrule height 0.4pt}\vspace{1pt}]
 
-%% Section: regular sans, indented, dot leaders
+%% Section: gray square + number, small, dot leaders
 \titlecontents{section}
   [2.5em]
   {\addvspace{2pt}\sffamily\small}
-  {\makebox[2.2em][l]{\textcolor{bcpAccentMid}{\thecontentslabel}}}
+  {\bcpGraySq\enspace\makebox[2.0em][l]{\thecontentslabel}}
   {}
-  {\titlerule*[0.5em]{\textcolor{bcpBorder}{.}}\contentspage}
+  {\titlerule*[0.5em]{\textcolor{black!18}{.}}\contentspage}
 
-%% Subsection: small sans, more indented
+%% Subsection: small gray, more indented, dot leaders
 \titlecontents{subsection}
   [5.0em]
   {\sffamily\small\color{bcpTextSecond}}
   {\makebox[2.8em][l]{\thecontentslabel}}
   {}
-  {\titlerule*[0.5em]{\textcolor{bcpBorder}{.}}\contentspage}
+  {\titlerule*[0.5em]{\textcolor{black!15}{.}}\contentspage}
 
 %% ─── Appendix heading re-labeling ────────────────────────────────────────────
-%% After \appendix, chapters get "Appendix A", "Appendix B", etc.
-%% The standard \appendix does this; we just ensure the header looks right.
-%% titlesec does not need changes — \chaptername changes to \appendixname automatically.
-
-%% ─── Starred sections go into page headers but not ToC ───────────────────────
-%% (already the LaTeX default, no customization needed)
+%% After \appendix, \chaptername changes to \appendixname automatically.
 
 \endinput

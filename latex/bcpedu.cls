@@ -135,6 +135,8 @@
 \RequirePackage{float}             % [H] figure placement
 \RequirePackage{wrapfig}           % text-wrapping figures
 \RequirePackage{subcaption}        % subfigures
+\RequirePackage{tikz}              % ghost numbers, title page decorations
+\usetikzlibrary{calc}             % coordinate arithmetic for TikZ nodes
 \RequirePackage{booktabs}          % \toprule, \midrule, \bottomrule
 \RequirePackage{longtable}         % tables spanning multiple pages
 \RequirePackage{multirow}          % multirow table cells
@@ -150,7 +152,8 @@
 
 %% ─── Adjust list spacing for compactness ─────────────────────────────────────
 \setlist{nosep, leftmargin=*, topsep=4pt}
-\setlist[itemize]{label=\textcolor{bcpAccent}{\textbullet}}
+%% Gold filled square bullets — matches business plan editorial style
+\setlist[itemize]{label=\raisebox{0.18em}{\textcolor{bcpAccent}{\rule{0.36em}{0.36em}}}}
 \setlist[enumerate]{label=\textcolor{bcpAccent}{\arabic*.}}
 
 %% ─── Figure and table caption styling ────────────────────────────────────────

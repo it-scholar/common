@@ -55,40 +55,41 @@
 \renewcommand{\maketitle}{%
   \begin{titlepage}%
     \thispagestyle{empty}%
-    %% ── Deep charcoal upper band (~45 % of the page height) ─────────────────
+    \setstretch{1.0}%
+    %%
+    %% Editorial minimalism title page — follows BCP business-plan design language:
+    %% white background, single gold accent, generous white space, bold sans type.
+    %%
+    \vspace*{3.5cm}%
+    %% Series label: tiny, uppercase, very gray (matches business plan top label)
     \noindent
-    {\setlength{\fboxsep}{0pt}%
-    \colorbox{bcpDark}{%
-      \parbox[t][0.45\textheight][t]{\textwidth}{%
-        \vspace{0.7cm}%
-        \hspace{0.5cm}%
-        {\sffamily\fontScaleS\bfseries\color{white!30!bcpDark}%
-          \MakeUppercase{\@bookseries}}%
-        \vfill
-        \hspace{0.5cm}%
-        {\sffamily\bfseries\fontsize{34pt}{40pt}\selectfont\color{white}%
-          \@booktitle\par}%
-        \vspace{0.6cm}%
-      }%
-    }}%
-    %% ── White area below the band ────────────────────────────────────────────
-    \vspace{0.8cm}%
-    \begin{flushleft}
-      \hspace{0.1cm}%
-      \ifx\@booksubtitle\empty\else
-        {\sffamily\fontScaleL\color{bcpTextSecond}\@booksubtitle}\\[14pt]
-      \fi
-    \end{flushleft}
-    {\color{bcpAccent}\rule{\textwidth}{2pt}}%
+    {\tiny\sffamily\color{black!40}\MakeUppercase{\@bookseries}}%
+    \par\vspace{1.8cm}%
+    %% Gold square accent mark
+    \noindent\textcolor{bcpAccent}{\rule{0.55em}{0.55em}}\par\vspace{0.5cm}%
+    %% Book title — very large bold sans (matches business plan BUSINESS/PLAN weight)
+    \noindent
+    {\fontsize{44pt}{46pt}\selectfont\sffamily\bfseries\color{black}\@booktitle\par}%
+    %% Subtitle — if present, smaller, gray
+    \ifx\@booksubtitle\empty\else
+      \vspace{0.8cm}%
+      \noindent{\large\sffamily\color{black!50}\@booksubtitle\par}%
+    \fi
+    \vspace{1.4cm}%
+    %% Short gold accent line (matches business plan short gold line)
+    \noindent{\color{bcpAccent}\rule{8cm}{1.5pt}}\par
     \vfill
-    \begin{flushleft}
-      {\sffamily\bfseries\fontScaleL\color{bcpTextMain}\@bookauthor}\\[6pt]
-      {\sffamily\small\color{bcpTextSecond}%
-        \@bookedition\enspace\textbullet\enspace Version \@bookversion}
-    \end{flushleft}
-    \vspace{0.4cm}%
-    {\color{bcpBorder}\rule{\textwidth}{0.4pt}}\\[4pt]
-    {\small\sffamily\color{bcpTextLight}\@bookseries}%
+    %% Author block with gold square (matches business plan info block style)
+    \noindent
+    \textcolor{bcpAccent}{\rule{0.5em}{0.5em}}\enspace
+    {\normalsize\sffamily\bfseries\color{black}\@bookauthor}%
+    \par\vspace{0.3cm}%
+    {\small\sffamily\color{black!50}%
+      \@bookedition\enspace\textperiodcentered\enspace Version~\@bookversion}%
+    \par\vspace{1.2cm}%
+    %% Bottom separator + series name
+    \noindent{\color{black!12}\rule{\textwidth}{0.4pt}}\\[4pt]%
+    {\tiny\sffamily\color{black!35}\@bookseries}%
   \end{titlepage}%
   \cleardoublepage
 }
