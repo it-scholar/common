@@ -57,27 +57,25 @@
 }
 
 %% ─── tcolorbox base styles ───────────────────────────────────────────────────
+%% All environments use the built-in tcolorbox title (not the floating boxed
+%% title approach). This guarantees the title never overlaps the content.
 \tcbset{
   bcpCodeBase/.style = {
     enhanced,
     breakable,
-    arc         = 4pt,
-    boxrule     = 0.6pt,
-    left        = 8pt,
-    right       = 8pt,
-    top         = 6pt,
-    bottom      = 6pt,
-    before skip = 10pt plus 3pt,
-    after skip  = 10pt plus 3pt,
-  },
-  bcpCodeHeader/.style = {
-    attach boxed title to top left = {yshift=-\tcboxedtitleheight+1pt, xshift=12pt},
-    boxed title style = {
-      enhanced,
-      arc     = 2pt,
-      boxrule = 0.5pt,
-      top=2pt, bottom=2pt, left=6pt, right=6pt,
-    },
+    arc          = 4pt,
+    boxrule      = 0.5pt,
+    left         = 8pt,
+    right        = 8pt,
+    top          = 4pt,
+    bottom       = 6pt,
+    toptitle     = 5pt,
+    bottomtitle  = 5pt,
+    lefttitle    = 10pt,
+    righttitle   = 10pt,
+    titlerule    = 0pt,   % no separator line — background color distinguishes title
+    before skip  = 12pt plus 3pt,
+    after skip   = 12pt plus 3pt,
   },
 }
 
@@ -91,7 +89,6 @@
 %%
 \newtcblisting{codefile}[2][text]{
   bcpCodeBase,
-  bcpCodeHeader,
   listing engine  = minted,
   listing only,
   minted language = {#1},
@@ -115,16 +112,15 @@
 %%
 \newtcblisting{codeblock}[1][text]{
   bcpCodeBase,
-  bcpCodeHeader,
   listing engine  = minted,
   listing only,
   minted language = {#1},
-  minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4, breaklines=true},
+  minted options  = {style=friendly, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
   colback         = bcpCodeBg,
   colframe        = bcpCodeBorder,
   coltitle        = bcpTextLight,
   colbacktitle    = bcpCodeBg,
-  title           = {\scriptsize\sffamily\MakeUppercase{#1}},
+  title           = {\scriptsize\sffamily\color{bcpTextLight}\MakeUppercase{#1}},
 }
 
 %% ─── Environment 3: terminalin ───────────────────────────────────────────────
@@ -136,18 +132,19 @@
 %%
 \newtcblisting{terminalin}[1][]{
   bcpCodeBase,
-  bcpCodeHeader,
   listing engine  = minted,
   listing only,
   minted language = bash,
   minted options  = {style=monokai, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
   colback         = bcpTermInBg,
-  colframe        = bcpAccentDark,
+  colframe        = bcpTermInBg,
+  coltext         = bcpTermInFg,
   coltitle        = bcpTermInFg,
-  colbacktitle    = bcpAccentDark,
+  colbacktitle    = black,
+  borderline west = {4pt}{0pt}{bcpAccent},
   title           = {\textcolor{bcpTermInPrompt}{\small\faTerminal}\enspace
-                     \textbf{\textcolor{bcpTermInFg}{Terminal}}%
-                     \ifblank{#1}{}{\enspace\textcolor{bcpTermInFg!50!bcpAccentDark}{---\enspace#1}}},
+                     \textbf{Terminal}%
+                     \ifblank{#1}{}{\enspace{\color{bcpTermInFg!50!black}\small---\enspace#1}}},
 }
 
 %% ─── Environment 4: terminalout ──────────────────────────────────────────────
@@ -159,18 +156,21 @@
 %%
 \newtcblisting{terminalout}[1][]{
   bcpCodeBase,
-  bcpCodeHeader,
   listing engine  = minted,
   listing only,
   minted language = text,
-  minted options  = {style=monokai, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
+  %% style=bw: plain-text lexer emits no explicit \textcolor commands,
+  %% so coltext below controls ALL output text color reliably.
+  minted options  = {style=bw, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
   colback         = bcpTermOutBg,
-  colframe        = bcpMidGray,
+  colframe        = bcpTermOutBg,
+  coltext         = bcpTermOutFg,
   coltitle        = bcpTermOutFg,
-  colbacktitle    = bcpMidGray,
-  title           = {\textcolor{bcpTermInPrompt!80!white}{\small\faAngleRight\faAngleRight}\enspace
-                     \textbf{\textcolor{bcpTermOutFg}{Output}}%
-                     \ifblank{#1}{}{\enspace\textcolor{bcpTermOutFg!60!bcpMidGray}{---\enspace#1}}},
+  colbacktitle    = black!70,
+  borderline west = {4pt}{0pt}{black!35},
+  title           = {{\small\color{bcpTermOutFg!70!black}\faAngleRight\faAngleRight}\enspace
+                     \textbf{Output}%
+                     \ifblank{#1}{}{\enspace{\color{bcpTermOutFg!50!black}\small---\enspace#1}}},
 }
 
 %% ─── Inline semantic commands ────────────────────────────────────────────────
