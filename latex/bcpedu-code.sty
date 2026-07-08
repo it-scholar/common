@@ -41,6 +41,14 @@
 \RequirePackage{tcolorbox}
 \tcbuselibrary{minted,skins,breakable,listings}
 \RequirePackage{minted}
+\RequirePackage{accsupp}   % PDF ActualText: marks decorations as non-copyable
+
+%% \bcpCopyExclude{<visual>} — render <visual> but set PDF ActualText to empty
+%% so that copy-paste in PDF viewers skips the decoration entirely.
+%% Used for line numbers in codefile and the $ prompt in terminalin.
+\newcommand{\bcpCopyExclude}[1]{%
+  \BeginAccSupp{method=escape,ActualText={}}#1\EndAccSupp{}%
+}
 
 %% ─── Pygments styles ─────────────────────────────────────────────────────────
 %% Light code blocks: 'friendly' (built-in, good for print + digital)
@@ -87,15 +95,25 @@
 %%          server { listen 80; }
 %%        \end{codefile}
 %%
+%% Line numbers are rendered via fancyvrb but tagged with PDF ActualText={} so
+%% that copy-paste in PDF viewers silently skips them.
+%%
 \newtcblisting{codefile}[2][text]{
   bcpCodeBase,
   listing engine  = minted,
   listing only,
   minted language = {#1},
-  %% xleftmargin shifts code right so line numbers sit inside the box frame.
-  %% numbersep controls the gap between the number and the code text.
+  %% xleftmargin gives line numbers their space inside the frame.
+  %% numbersep controls the gap between number and code text.
   minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4,
                      breaklines=true, xleftmargin=2em, numbersep=8pt},
+  %% Redefine \theFancyVerbLine just before content is typeset so line numbers
+  %% are non-copyable in the output PDF.
+  before upper    = {%
+    \renewcommand{\theFancyVerbLine}{%
+      \bcpCopyExclude{{\footnotesize\color{bcpLineNum}\arabic{FancyVerbLine}}}%
+    }%
+  },
   colback         = bcpCodeBg,
   colframe        = bcpCodeBorder,
   coltitle        = bcpTextMain,
@@ -129,8 +147,12 @@
 %% ─── Environment 3: terminalin ───────────────────────────────────────────────
 %% #1 = optional label (default: empty)
 %%
+%% AUTHORING CONVENTION: write commands WITHOUT the $ prompt.
+%% The prompt is injected automatically via \theFancyVerbLine and tagged with
+%% PDF ActualText={} so copy-paste silently skips it.
+%%
 %% Usage: \begin{terminalin}[My Server]
-%%          $ kubectl get pods
+%%          kubectl get pods
 %%        \end{terminalin}
 %%
 \newtcblisting{terminalin}[1][]{
@@ -138,7 +160,15 @@
   listing engine  = minted,
   listing only,
   minted language = bash,
-  minted options  = {style=monokai, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
+  %% linenos=true so fancyvrb renders one entry per line — we replace the
+  %% number with a non-copyable $ prompt via \theFancyVerbLine below.
+  minted options  = {style=monokai, linenos=true, fontsize=\small, tabsize=4,
+                     breaklines=true, xleftmargin=2em, numbersep=8pt},
+  before upper    = {%
+    \renewcommand{\theFancyVerbLine}{%
+      \bcpCopyExclude{{\small\bfseries\color{bcpTermInPrompt}\$}}%
+    }%
+  },
   colback         = bcpTermInBg,
   colframe        = bcpTermInBg,
   coltext         = bcpTermInFg,
