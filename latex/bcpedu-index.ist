@@ -1,0 +1,33 @@
+% bcpedu-index.ist — MakeIndex style for BCP Education books
+% Controls the visual formatting of the back-of-book index.
+% This file is referenced by imakeidx via options={-s bcpedu-index.ist}
+
+% Heading for each letter group (A, B, C, ...)
+headings_flag 1
+heading_prefix "{\\sffamily\\bfseries\\color{bcpAccent}\\large "
+heading_suffix "}\\nopagebreak\n"
+
+% Delimiter between entry and page number
+delim_0 "\\hfill "
+delim_1 "\\hfill "
+delim_2 "\\hfill "
+
+% Page number ranges: "5--8"
+suffix_2p "\\,f."
+suffix_3p "--"
+
+% Line break between letter groups
+group_skip "\\indexspace\n"
+
+% Indentation for sub-entries
+indent_space "\\quad"
+indent_length 1
+
+% Remove page for entries with only subentries
+item_0  "\n  \\item "
+item_1  "\n    \\subitem "
+item_2  "\n      \\subsubitem "
+item_01 "\n  \\item "
+item_x1 "\n  \\item "
+item_12 "\n    \\subitem "
+item_x2 "\n    \\subitem "

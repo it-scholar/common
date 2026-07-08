@@ -1,0 +1,267 @@
+%% =============================================================================
+%% bcpedu-code.sty — Code and Terminal Environments
+%% =============================================================================
+%% Provides four environments for all code/terminal content:
+%%
+%%   \begin{codefile}[language]{filename}...\end{codefile}
+%%     Syntax-highlighted code with filename header label, line numbers.
+%%     For named files: configuration files, source code listings.
+%%
+%%   \begin{codeblock}[language]...\end{codeblock}
+%%     Anonymous syntax-highlighted code, optional language label.
+%%     For snippets without a filename.
+%%
+%%   \begin{terminalin}[label]...\end{terminalin}
+%%     Dark-background shell input. Renders lines prefixed with $ prompt.
+%%     For commands the reader types.
+%%
+%%   \begin{terminalout}[label]...\end{terminalout}
+%%     Command output. Slightly lighter background than terminalin.
+%%     For command output shown to reader.
+%%
+%% All environments:
+%%   - breakable (span multiple pages)
+%%   - Optional line range: firstline=N, lastline=M
+%%   - Highlighted lines: highlightlines={2,5,7-9}
+%%
+%% Inline:
+%%   \code{text}          — defined in bcpedu-fonts.sty
+%%   \filename{path}      — file/path styling
+%%   \envvar{NAME}        — environment variable
+%%   \cmdname{git}        — command name
+%%
+%% Requirements:
+%%   - Python 3 + Pygments  (pip3 install pygments)
+%%   - LaTeX compiled with --shell-escape
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-code}[2026/07/08 v1.0 BCP Education Code Environments]
+
+\RequirePackage{tcolorbox}
+\tcbuselibrary{minted,skins,breakable,listings}
+\RequirePackage{minted}
+
+%% ─── Pygments minted styles ──────────────────────────────────────────────────
+%% Digital: Dracula-inspired dark style via 'dracula' Pygments style (or 'native')
+%% Print:   'friendly' style (light background, works well in gray)
+%%
+%% The minted 'style' is set per-environment using the \if@bcpprint flag
+%% exposed by bcpedu-colors. We set a global default and allow override.
+%%
+\newcommand{\bcpMintedStyle}{dracula}
+\newcommand{\bcpMintedStyleLight}{friendly}
+
+%% Set minted global options
+\setminted{
+  breaklines       = true,
+  breakanywhere    = false,
+  breaksymbol      = \tiny\color{bcpTextLight}\ensuremath{\hookrightarrow},
+  fontsize         = \small,
+  tabsize          = 4,
+  linenos          = true,
+  numbersep        = 8pt,
+  xleftmargin      = 2pt,
+}
+
+%% ─── tcolorbox base styles ───────────────────────────────────────────────────
+\tcbset{
+  bcpCodeBase/.style = {
+    enhanced,
+    breakable,
+    arc           = 4pt,
+    boxrule       = 0.6pt,
+    left          = 8pt,
+    right         = 8pt,
+    top           = 6pt,
+    bottom        = 6pt,
+    fontupper     = \small\ttfamily,
+    before skip   = 10pt plus 3pt,
+    after skip    = 10pt plus 3pt,
+  },
+  %% Header bar style (used by codefile and terminalin/out)
+  bcpCodeHeader/.style = {
+    attach boxed title to top left = {yshift=-\tcboxedtitleheight+1pt, xshift=12pt},
+    boxed title style = {
+      enhanced,
+      arc         = 2pt,
+      boxrule     = 0.5pt,
+      top         = 2pt,
+      bottom      = 2pt,
+      left        = 6pt,
+      right       = 6pt,
+    },
+  },
+}
+
+%% ─── Environment 1: codefile ─────────────────────────────────────────────────
+%% Usage: \begin{codefile}[bash]{/etc/nginx/nginx.conf}
+%%          ...code...
+%%        \end{codefile}
+%%
+%% Optional minted options: [language, firstline=N, lastline=M, highlightlines={2,4}]
+%%
+\newenvironment{codefile}[2][text]{%
+  \def\bcpFileLang{#1}%
+  \def\bcpFileName{#2}%
+  \begin{tcolorbox}[
+    bcpCodeBase,
+    bcpCodeHeader,
+    colback       = bcpCodeBg,
+    colframe      = bcpCodeBorder,
+    coltitle      = bcpTextMain,
+    colbacktitle  = bcpCodeBorder,
+    title         = {\ttfamily\small\textcolor{bcpAccent}{\faFile*[regular]\enspace}\textbf{\bcpFileName}%
+                     \hfill\textcolor{bcpTextLight}{\scriptsize\MakeUppercase{\bcpFileLang}}},
+  ]%
+  \begin{minted}[
+    style         = \bcpMintedStyleLight,
+    bgcolor       = bcpCodeBg,
+    linenos       = true,
+    numbersep     = 8pt,
+    fontsize      = \small,
+  ]{\bcpFileLang}%
+}{%
+  \end{minted}%
+  \end{tcolorbox}%
+}
+
+%% ─── Environment 2: codeblock ────────────────────────────────────────────────
+%% Usage: \begin{codeblock}[yaml]
+%%          ...
+%%        \end{codeblock}
+%%
+\newenvironment{codeblock}[1][text]{%
+  \def\bcpLang{#1}%
+  \begin{tcolorbox}[
+    bcpCodeBase,
+    colback       = bcpCodeBg,
+    colframe      = bcpCodeBorder,
+    title         = {\textcolor{bcpTextLight}{\scriptsize\sffamily\MakeUppercase{#1}}},
+    detach title,
+    before upper  = {\tcbtitle\vspace{4pt}},
+  ]%
+  \begin{minted}[
+    style         = \bcpMintedStyleLight,
+    bgcolor       = bcpCodeBg,
+    linenos       = true,
+    fontsize      = \small,
+  ]{\bcpLang}%
+}{%
+  \end{minted}%
+  \end{tcolorbox}%
+}
+
+%% ─── Environment 3: terminalin ───────────────────────────────────────────────
+%% Dark-background shell input block.
+%% Lines starting with $ are styled as prompts; other lines continue input.
+%%
+%% Usage: \begin{terminalin}[Optional label]
+%%          $ kubectl get pods -n default
+%%          $ kubectl describe pod my-pod
+%%        \end{terminalin}
+%%
+\newenvironment{terminalin}[1][]{%
+  \def\bcpTermLabel{#1}%
+  \begin{tcolorbox}[
+    bcpCodeBase,
+    bcpCodeHeader,
+    colback       = bcpTermInBg,
+    colframe      = bcpAccentDark,
+    coltitle      = bcpTermInFg,
+    colbacktitle  = bcpAccentDark,
+    fontupper     = \small\ttfamily\color{bcpTermInFg},
+    title         = {%
+      \textcolor{bcpTermInPrompt}{\small\faTerminal}\enspace
+      \textbf{\textcolor{bcpTermInFg}{Terminal}}%
+      \ifx\bcpTermLabel\empty\else\enspace\textcolor{bcpTermInFg!50!bcpAccentDark}{---\enspace\bcpTermLabel}\fi
+    },
+  ]%
+  \begin{minted}[
+    style         = dracula,
+    bgcolor       = bcpTermInBg,
+    linenos       = false,
+    fontsize      = \small,
+  ]{bash}%
+}{%
+  \end{minted}%
+  \end{tcolorbox}%
+}
+
+%% ─── Environment 4: terminalout ──────────────────────────────────────────────
+%% Terminal output — slightly lighter than input, no prompt styling.
+%%
+%% Usage: \begin{terminalout}[Optional label]
+%%          NAME    READY  STATUS   RESTARTS  AGE
+%%          my-pod  1/1    Running  0         5d
+%%        \end{terminalout}
+%%
+\newenvironment{terminalout}[1][]{%
+  \def\bcpOutLabel{#1}%
+  \begin{tcolorbox}[
+    bcpCodeBase,
+    bcpCodeHeader,
+    colback       = bcpTermOutBg,
+    colframe      = bcpMidGray,
+    coltitle      = bcpTermOutFg,
+    colbacktitle  = bcpMidGray,
+    fontupper     = \small\ttfamily\color{bcpTermOutFg},
+    title         = {%
+      \textcolor{bcpTermInPrompt!80!white}{\small\faAngleRight\faAngleRight}\enspace
+      \textbf{\textcolor{bcpTermOutFg}{Output}}%
+      \ifx\bcpOutLabel\empty\else\enspace\textcolor{bcpTermOutFg!60!bcpMidGray}{---\enspace\bcpOutLabel}\fi
+    },
+  ]%
+  \begin{minted}[
+    style         = monokai,
+    bgcolor       = bcpTermOutBg,
+    linenos       = false,
+    fontsize      = \small,
+  ]{text}%
+}{%
+  \end{minted}%
+  \end{tcolorbox}%
+}
+
+%% ─── Inline semantic commands ────────────────────────────────────────────────
+%% \code{} is defined in bcpedu-fonts.sty for styled inline code.
+%% The following add semantic meaning on top.
+
+%% File path or filename
+\newcommand{\filename}[1]{%
+  \texttt{\textcolor{bcpAccentDark}{#1}}%
+}
+
+%% Environment variable name
+\newcommand{\envvar}[1]{%
+  \texttt{\textcolor{bcpDefPurple}{\$#1}}%
+}
+
+%% Command / binary name
+\newcommand{\cmdname}[1]{%
+  \texttt{\textbf{\textcolor{bcpNoteBlue}{#1}}}%
+}
+
+%% Key/value pair inline
+\newcommand{\kvpair}[2]{%
+  \texttt{\textcolor{bcpAccentDark}{#1}\textcolor{bcpTextLight}{=}\textcolor{bcpExerciseTeal}{#2}}%
+}
+
+%% ─── List of Listings caption ────────────────────────────────────────────────
+%% minted does not automatically add to LoL. Use \captionof or the listing env:
+%%
+%% \begin{listing}[H]
+%%   \begin{codefile}[bash]{example.sh}...\end{codefile}
+%%   \caption{Description of listing}
+%%   \label{lst:example}
+%% \end{listing}
+%%
+%% The \listoflistings command (from minted) will then pick these up.
+%% We rename it to \listofcode for clarity.
+\AtBeginDocument{%
+  \@ifundefined{listoflistings}{}{%
+    \let\listofcode\listoflistings
+  }%
+}
+
+\endinput

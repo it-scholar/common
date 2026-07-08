@@ -1,0 +1,177 @@
+%% =============================================================================
+%% bcpedu-front.sty — Front Matter: Title Page, ToC, and Lists
+%% =============================================================================
+%% Provides:
+%%   - Custom \maketitle replacement (full title page design)
+%%   - \bcphalftitle — half-title page (book title only, before full title)
+%%   - \bcpcopyrightpage — copyright/colophon page
+%%   - Styled Table of Contents (via titletoc, set up in bcpedu-headings)
+%%   - \listoffigures, \listoftables, \listofcode (styled headers)
+%%   - Preface/About environment
+%%
+%% Usage in main.tex:
+%%   \frontmatter
+%%   \bcphalftitle          % optional half-title
+%%   \maketitle             % full title page
+%%   \bcpcopyrightpage      % copyright
+%%   \tableofcontents
+%%   \listoffigures         % if book has figures
+%%   \listoftables          % if book has tables
+%%   \listofcode            % if book has code listings
+%%   \begin{preface}...\end{preface}
+%%   \mainmatter
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-front}[2026/07/08 v1.0 BCP Education Front Matter]
+
+\RequirePackage{afterpage}
+\RequirePackage{geometry}   % for temporary margin changes on title page
+
+%% ─── Half-title page ─────────────────────────────────────────────────────────
+%% A traditional opening page with just the book title, before the full title page.
+%% Optional — remove \bcphalftitle if not wanted.
+\newcommand{\bcphalftitle}{%
+  \thispagestyle{empty}%
+  \null\vfill
+  \begin{center}
+    {\sffamily\bfseries\fontScaleXXL\color{bcpTextMain}\@booktitle}
+  \end{center}
+  \vfill\null
+  \cleardoublepage
+}
+
+%% ─── Full title page ─────────────────────────────────────────────────────────
+%% Replaces the standard \maketitle with a designed title page.
+%% Layout:
+%%   - Accent color band across the top (20% of page height)
+%%   - Series name + book number in the band
+%%   - Book title in large bold sans below the band
+%%   - Subtitle in regular sans
+%%   - Horizontal accent rule
+%%   - Author + Edition at the bottom
+%%
+\renewcommand{\maketitle}{%
+  \begin{titlepage}%
+    \thispagestyle{empty}%
+    %% Top accent band
+    \noindent
+    \colorbox{bcpAccent}{%
+      \parbox[t][0.22\textheight][c]{\textwidth}{%
+        \centering
+        \vfill
+        {\sffamily\small\color{white!70!bcpAccent}\MakeUppercase{\@bookseries}}\\[6pt]
+        \vfill
+      }%
+    }%
+    \vspace{1.5cm}
+    %% Book title
+    \begin{flushleft}
+      {\sffamily\bfseries\fontScaleH\color{bcpTextMain}\@booktitle}\\[8pt]
+      \ifx\@booksubtitle\empty\else
+        {\sffamily\fontScaleXL\color{bcpTextSecond}\@booksubtitle}\\[8pt]
+      \fi
+    \end{flushleft}
+    %% Accent rule
+    {\color{bcpAccent}\rule{\textwidth}{1.5pt}}
+    \vfill
+    %% Author and edition
+    \begin{flushleft}
+      {\sffamily\bfseries\fontScaleL\color{bcpTextMain}\@bookauthor}\\[4pt]
+      {\sffamily\small\color{bcpTextSecond}\@bookedition\ \textbullet\ Version \@bookversion}
+    \end{flushleft}
+    %% Bottom thin rule
+    {\color{bcpBorder}\rule{\textwidth}{0.4pt}}
+    \vspace{4pt}
+    \begin{flushleft}
+      {\small\sffamily\color{bcpTextLight}\@bookseries}
+    \end{flushleft}
+  \end{titlepage}%
+  \cleardoublepage
+}
+
+%% ─── Copyright / Colophon page ────────────────────────────────────────────────
+%% \bcpcopyrightpage — standard back-of-title copyright notice.
+%% Customize the text here or override in main.tex with:
+%%   \renewcommand{\bcpcopyrighttext}{...}
+%%
+\newcommand{\bcpcopyrighttext}{%
+  Copyright \textcopyright\ \the\year\ \@bookauthor. All rights reserved.\\[6pt]
+  No part of this book may be reproduced or transmitted in any form
+  without written permission from the publisher.\\[6pt]
+  \textbf{Version \@bookversion} --- \@bookedition
+}
+
+\newcommand{\bcpcopyrightpage}{%
+  \thispagestyle{empty}%
+  \null\vfill
+  \begin{flushleft}
+    \small\color{bcpTextSecond}
+    \bcpcopyrighttext
+    \par\vspace{12pt}
+    \textit{Typeset with \XeLaTeX\ and the \texttt{bcpedu} document class.}
+  \end{flushleft}
+  \cleardoublepage
+}
+
+%% ─── Table of Contents ────────────────────────────────────────────────────────
+%% The ToC entry styles are set in bcpedu-headings.sty via titletoc.
+%% Here we override the ToC title style and depth.
+\setcounter{tocdepth}{2}          % show chapters + sections + subsections
+\setcounter{secnumdepth}{3}       % number chapters + sections + subsections + subsubsections
+
+%% Style the ToC heading consistently with section headings
+\renewcommand{\contentsname}{Table of Contents}
+\renewcommand{\listfigurename}{List of Figures}
+\renewcommand{\listtablename}{List of Tables}
+
+%% Styled ToC/LoF/LoT page headers (use \chapter* but style like our front matter)
+\newcommand{\bcpFrontChapterStyle}[1]{%
+  \chapter*{#1}%
+  \addcontentsline{toc}{chapter}{#1}%
+  \markboth{#1}{#1}%
+}
+
+%% ─── Preface / About this book environment ────────────────────────────────────
+%% \begin{preface}[Optional title override]
+%%   ...
+%% \end{preface}
+%%
+\newenvironment{preface}[1][Preface]{%
+  \bcpFrontChapterStyle{#1}%
+  \begin{itshape}%
+}{%
+  \end{itshape}%
+  \cleardoublepage
+}
+
+%% ─── Acknowledgements ────────────────────────────────────────────────────────
+\newenvironment{acknowledgements}[1][Acknowledgements]{%
+  \bcpFrontChapterStyle{#1}%
+}{%
+  \cleardoublepage
+}
+
+%% ─── How to use this book ────────────────────────────────────────────────────
+\newenvironment{howto}[1][How to Use This Book]{%
+  \bcpFrontChapterStyle{#1}%
+}{%
+  \cleardoublepage
+}
+
+%% ─── List headings in styled format ──────────────────────────────────────────
+%% \listoffigures, \listoftables use \chapter* internally.
+%% We patch them to also add to ToC and set running marks.
+\let\bcpOrigLoF\listoffigures
+\renewcommand{\listoffigures}{%
+  \bcpOrigLoF
+  \addcontentsline{toc}{chapter}{\listfigurename}%
+}
+
+\let\bcpOrigLoT\listoftables
+\renewcommand{\listoftables}{%
+  \bcpOrigLoT
+  \addcontentsline{toc}{chapter}{\listtablename}%
+}
+
+\endinput

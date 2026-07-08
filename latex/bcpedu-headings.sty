@@ -1,0 +1,166 @@
+%% =============================================================================
+%% bcpedu-headings.sty — Chapter, Section, and Part Heading Styles
+%% =============================================================================
+%% Uses titlesec to style all structural heading levels.
+%%
+%% Design:
+%%   \part       — full-page color divider with large number + title
+%%   \chapter    — large accent-colored number, bold sans title, accent rule below
+%%   \section    — bold sans, accent-colored numeral, small rule
+%%   \subsection — bold sans, dark gray
+%%   \subsubsection — italic sans, gray
+%%   \paragraph  — bold sans inline
+%%
+%% The chapter opening page is always on the right (recto) — enforced by `openright`
+%% in the class. The titlesec `display` format provides a visually strong chapter
+%% opener suitable for a 300-1000 page technical book.
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-headings}[2026/07/08 v1.0 BCP Education Heading Styles]
+
+\RequirePackage{titlesec}
+\RequirePackage{titletoc}   % ToC entry styling
+\RequirePackage{needspace}  % prevent floating headings
+
+%% ─── Part pages ──────────────────────────────────────────────────────────────
+%% Full-page divider: accent-color top band, large roman part number, title.
+%% In print mode bcpAccent is dark, so this still works as a strong divider.
+\titleformat{\part}[display]
+  {\thispagestyle{empty}\pagecolor{bcpAccentLight}\color{bcpAccent}}  % page + text color
+  {%
+    \sffamily\fontScaleL\MakeUppercase{\partname}\enspace\thepart
+    \vspace{6pt}%
+    {\color{bcpAccent}\rule{\textwidth}{1.5pt}}%
+  }
+  {0pt}
+  {%
+    \sffamily\bfseries\fontScaleH\color{bcpAccentDark}%
+  }
+  [%
+    \vfill
+    \afterpage{\pagecolor{white}}  % restore normal page color after part page
+  ]
+
+%% ─── Chapter headings ────────────────────────────────────────────────────────
+%% Layout:
+%%   Line 1: "Chapter N" in small caps gray sans (label)
+%%   Line 2: Title in large bold sans, accent-colored
+%%   Line 3: Full-width accent rule
+%%
+\titleformat{\chapter}[display]
+  {\sffamily\bfseries}
+  {%
+    % Chapter label: "Chapter N" small, all caps, gray
+    \fontScaleL\color{bcpTextLight}\MakeUppercase{\chaptername}\enspace
+    \color{bcpAccent}\fontScaleH\thechapter
+  }
+  {12pt}
+  {%
+    % Chapter title
+    \fontScaleXXL\color{bcpTextMain}%
+  }
+  [%
+    % Decorative rule below the title
+    \vspace{4pt}%
+    {\color{bcpAccent}\rule{\textwidth}{1.5pt}}%
+    \vspace{16pt}%
+  ]
+
+%% Chapter spacing: top space (from top of text block), before/after spacing
+\titlespacing*{\chapter}
+  {0pt}       % left indent
+  {0pt}       % space above (distance from top margin to label)
+  {28pt}      % space below (between rule and first paragraph)
+
+%% ─── Section ─────────────────────────────────────────────────────────────────
+%% Bold sans, accent numeral, full-width light rule below
+\titleformat{\section}
+  {\needspace{4\baselineskip}\sffamily\bfseries\fontScaleXL\color{bcpTextMain}}
+  {\textcolor{bcpAccent}{\thesection}\enspace}
+  {0pt}
+  {}
+  [{\color{bcpBorder}\vspace{2pt}\rule{\textwidth}{0.4pt}\vspace{2pt}}]
+
+\titlespacing*{\section}
+  {0pt}{18pt plus 4pt minus 2pt}{8pt plus 2pt}
+
+%% ─── Subsection ──────────────────────────────────────────────────────────────
+%% Bold sans, dark gray numeral, no rule
+\titleformat{\subsection}
+  {\needspace{3\baselineskip}\sffamily\bfseries\fontScaleL\color{bcpTextMain}}
+  {\textcolor{bcpAccentMid}{\thesubsection}\enspace}
+  {0pt}
+  {}
+
+\titlespacing*{\subsection}
+  {0pt}{14pt plus 3pt minus 2pt}{5pt plus 1pt}
+
+%% ─── Subsubsection ───────────────────────────────────────────────────────────
+%% Bold sans, no number displayed in text (but numbered internally for ToC)
+\titleformat{\subsubsection}
+  {\needspace{2\baselineskip}\sffamily\bfseries\normalsize\color{bcpDarkGray}}
+  {\textcolor{bcpTextLight}{\thesubsubsection}\enspace}
+  {0pt}
+  {}
+
+\titlespacing*{\subsubsection}
+  {0pt}{10pt plus 2pt minus 1pt}{4pt}
+
+%% ─── Paragraph and subparagraph ──────────────────────────────────────────────
+\titleformat{\paragraph}[runin]
+  {\sffamily\bfseries\normalsize\color{bcpTextMain}}
+  {}
+  {0pt}
+  {}
+  [.\enspace]
+
+\titleformat{\subparagraph}[runin]
+  {\sffamily\itshape\normalsize\color{bcpTextSecond}}
+  {}
+  {0pt}
+  {}
+  [.\enspace]
+
+%% ─── Table of Contents entry formatting ──────────────────────────────────────
+%% Part: bold, full width, accent color
+\titlecontents{part}
+  [0em]
+  {\addvspace{12pt}\sffamily\bfseries\fontScaleL\color{bcpAccent}}
+  {\partname\enspace\thecontentslabel\quad}
+  {}
+  {}
+
+%% Chapter: bold sans, dot leaders, page number
+\titlecontents{chapter}
+  [0em]
+  {\addvspace{6pt}\sffamily\bfseries\normalsize}
+  {\makebox[2.2em][l]{\textcolor{bcpAccent}{\thecontentslabel}}}
+  {}
+  {\hfill\textcolor{bcpTextLight}{\contentspage}}
+
+%% Section: regular sans, indented, dot leaders
+\titlecontents{section}
+  [2.5em]
+  {\addvspace{2pt}\sffamily\small}
+  {\makebox[2.2em][l]{\textcolor{bcpAccentMid}{\thecontentslabel}}}
+  {}
+  {\titlerule*[0.5em]{\textcolor{bcpBorder}{.}}\contentspage}
+
+%% Subsection: small sans, more indented
+\titlecontents{subsection}
+  [5.0em]
+  {\sffamily\small\color{bcpTextSecond}}
+  {\makebox[2.8em][l]{\thecontentslabel}}
+  {}
+  {\titlerule*[0.5em]{\textcolor{bcpBorder}{.}}\contentspage}
+
+%% ─── Appendix heading re-labeling ────────────────────────────────────────────
+%% After \appendix, chapters get "Appendix A", "Appendix B", etc.
+%% The standard \appendix does this; we just ensure the header looks right.
+%% titlesec does not need changes — \chaptername changes to \appendixname automatically.
+
+%% ─── Starred sections go into page headers but not ToC ───────────────────────
+%% (already the LaTeX default, no customization needed)
+
+\endinput

@@ -1,0 +1,155 @@
+%% =============================================================================
+%% bcpedu-back.sty — Back Matter: Glossary, Index, Bibliography, Appendix
+%% =============================================================================
+%% Provides:
+%%   - Glossary via glossaries-extra
+%%       \term{docker image}           — inline; auto-adds to glossary + index
+%%       \termdef{docker image}{defn}  — define a term (in glossary file or inline)
+%%   - Two-column back-of-book index via imakeidx
+%%       \idx{keyword}                 — add entry without printing it
+%%       \idxbold{keyword}             — bold index entry (definition location)
+%%   - Bibliography via biblatex + biber
+%%       Style: ieee (footnote-friendly for technical books)
+%%       Override: \bcpbibstyle{authoryear} before \usepackage{bcpedu-back}
+%%   - Appendix styling: "Appendix A" prefix on chapter headers
+%%
+%% Back matter usage in main.tex:
+%%   \backmatter
+%%   \begin{appendices}
+%%     \chapter{Reference Tables}\input{back/appendix-a}
+%%   \end{appendices}
+%%   \printbibliography
+%%   \printglossary[type=main,title=Glossary]
+%%   \printindex
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-back}[2026/07/08 v1.0 BCP Education Back Matter]
+
+%% ─── Bibliography with biblatex ──────────────────────────────────────────────
+%% ieee style: numbered citations [1], [2], ...; list ordered by appearance.
+%% Suitable for technical books with many web/tool references.
+%% To change to authoryear, set \providecommand{\bcpbibstyle}{authoryear} before loading.
+\providecommand{\bcpbibstyle}{ieee}
+
+\RequirePackage[
+  style      = \bcpbibstyle,
+  backend    = biber,
+  sortlocale = en_US,
+  url        = true,
+  doi        = false,
+  isbn       = false,
+  eprint     = false,
+  maxbibnames= 6,
+]{biblatex}
+
+%% Style the bibliography heading to match our front matter chapter style
+\defbibheading{bibliography}[\bibname]{%
+  \chapter*{#1}%
+  \addcontentsline{toc}{chapter}{#1}%
+  \markboth{#1}{#1}%
+}
+
+%% ─── Glossary with glossaries-extra ──────────────────────────────────────────
+\RequirePackage[
+  toc,
+  automake,
+  stylemods = {mcols},
+  style     = mcolindex,   % two-column alphabetical list
+]{glossaries-extra}
+
+%% \term{keyword} — inline use; prints keyword in text AND adds to glossary.
+%% If the term has a glossary entry (\newglossaryentry), it links there.
+%% If not, it just adds an index entry.
+\newcommand{\term}[1]{%
+  \ifglsentryexists{#1}{%
+    \gls{#1}%
+  }{%
+    \emph{#1}%
+  }%
+  \index{#1}%
+}
+
+%% \termdef{label}{name}{description}
+%% Define a term inline (alternative to a separate glossary.tex file).
+%% The term is also indexed.
+%% Usage: \termdef{docker-image}{Docker Image}{A read-only template for containers.}
+\newcommand{\termdef}[3]{%
+  \newglossaryentry{#1}{name={#2}, description={#3}}%
+  \gls{#1}%
+  \index{#2}%
+}
+
+%% Style the glossary chapter heading
+\renewcommand*{\glossarysection}[2][]{%
+  \chapter*{#2}%
+  \addcontentsline{toc}{chapter}{#2}%
+  \markboth{#2}{#2}%
+}
+
+%% ─── Index with imakeidx ─────────────────────────────────────────────────────
+\RequirePackage{imakeidx}
+
+\makeindex[
+  columns   = 2,
+  columnseprule = true,
+  title     = Index,
+  intoc     = true,
+  options   = {-s bcpedu-index.ist},  % custom index style file (created separately)
+]
+
+%% \idx{keyword} — add to index without printing; for use mid-paragraph
+\newcommand{\idx}[1]{\index{#1}}
+
+%% \idxbold{keyword} — add bold page reference (definition page)
+\newcommand{\idxbold}[1]{\index{#1|textbf}}
+
+%% Style the index heading
+\indexsetup{
+  level     = \chapter*,
+  toclevel  = chapter,
+  noclearpage,
+}
+
+%% ─── Appendix styling ────────────────────────────────────────────────────────
+%% The appendices environment restores \appendixname = "Appendix" and resets
+%% the chapter counter. Chapter headings become "Appendix A — Title".
+\RequirePackage{appendix}
+
+\renewcommand{\appendixpagename}{Appendices}
+\renewcommand{\appendixtocname}{Appendices}
+
+%% Ensure appendix chapters start on recto pages
+\renewcommand{\appendixpage}{%
+  \cleardoublepage
+  \thispagestyle{empty}%
+  \null\vfill
+  \begin{center}
+    {\color{bcpAccent}\rule{0.4\textwidth}{1pt}}\\[12pt]
+    {\sffamily\bfseries\fontScaleXXL\color{bcpTextMain}\appendixpagename}\\[12pt]
+    {\color{bcpAccent}\rule{0.4\textwidth}{1pt}}
+  \end{center}
+  \vfill\null
+  \addappheadtotoc
+  \cleardoublepage
+}
+
+%% ─── Index style file (bcpedu-index.ist) ─────────────────────────────────────
+%% This file customizes the MakeIndex formatting.
+%% It will be written to the build directory by the Makefile.
+%% We define it here as a string that Makefile.common writes on first build.
+
+%% ─── Convenient back matter command ──────────────────────────────────────────
+%% \bcpbackmatter — a shorthand to call all back matter lists in one go.
+%% Individual books can call components separately for full control.
+%%
+%% Usage: place \bcpbackmatter just before \end{document}
+%%
+%% \newcommand{\bcpbackmatter}{%
+%%   \backmatter
+%%   \printbibliography
+%%   \printglossary[type=main,title=Glossary]
+%%   \printindex
+%% }
+
+\endinput

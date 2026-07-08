@@ -1,0 +1,231 @@
+%% =============================================================================
+%% bcpedu-callouts.sty — Callout / Admonition Boxes
+%% =============================================================================
+%% Provides 9 styled callout environments using tcolorbox.
+%% All boxes are breakable (span page boundaries).
+%%
+%% Environments:
+%%   \begin{notebox}[Optional Title]     — Note / Information
+%%   \begin{tipbox}[Optional Title]      — Tip / Best Practice
+%%   \begin{warningbox}[Optional Title]  — Warning / Caution
+%%   \begin{dangerbox}[Optional Title]   — Danger / Critical
+%%   \begin{exercisebox}[Optional Title] — Exercise / Lab
+%%   \begin{definitionbox}[Optional Title]— Definition / Concept
+%%   \begin{examplebox}[Optional Title]  — Example
+%%   \begin{objectivesbox}[Optional Title]— "In this chapter" / Learning Objectives
+%%   \begin{seealsobox}[Book Title]      — Cross-book reference (see bcpedu-crossref)
+%%
+%% Design:
+%%   - Left accent border (4pt, colored)
+%%   - Small icon (fontawesome5) in title
+%%   - Title defaults to the box type name if not provided
+%%   - Digital: colored background, colored title, colored border
+%%   - Print:   white background, black title, gray border (ink-efficient)
+%%
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-callouts}[2026/07/08 v1.0 BCP Education Callout Boxes]
+
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\RequirePackage{fontawesome5}
+
+%% ─── Shared base style ───────────────────────────────────────────────────────
+\tcbset{
+  bcpCalloutBase/.style = {
+    enhanced,
+    breakable,
+    arc           = 3pt,
+    boxrule       = 0pt,          % no outer border (we use left rule only)
+    borderline west = {4pt}{0pt}{##1},  % thick left accent bar; ##1 = accent color arg
+    left          = 14pt,
+    right         = 10pt,
+    top           = 8pt,
+    bottom        = 8pt,
+    before skip   = 12pt plus 3pt,
+    after skip    = 12pt plus 3pt,
+    fonttitle     = {\sffamily\bfseries\small},
+    attach title to upper = {\par\vspace{2pt}},
+    fontupper     = {\small\setstretch{1.1}},
+  },
+}
+
+%% ─── Internal helper: build callout environment ──────────────────────────────
+%% #1 = environment name (notebox, tipbox, ...)
+%% #2 = default title text ("Note", "Tip", ...)
+%% #3 = fontawesome icon command
+%% #4 = background color name
+%% #5 = border/accent color name
+%% #6 = title text color name
+%%
+\newcommand{\bcpDefineCallout}[6]{%
+  \newenvironment{#1}[1][#2]{%
+    \begin{tcolorbox}[
+      bcpCalloutBase = {#5},
+      colback        = #4,
+      colframe       = #5,
+      coltitle       = #6,
+      title          = {#3\enspace##1},
+    ]%
+  }{%
+    \end{tcolorbox}%
+  }%
+}
+
+%% ─── 1. Note / Information ───────────────────────────────────────────────────
+\bcpDefineCallout{notebox}%
+  {Note}%
+  {\faInfoCircle}%
+  {bcpNoteBg}%
+  {bcpNoteBlue}%
+  {bcpNoteBlue}
+
+%% ─── 2. Tip / Best Practice ──────────────────────────────────────────────────
+\bcpDefineCallout{tipbox}%
+  {Tip}%
+  {\faLightbulb}%
+  {bcpTipBg}%
+  {bcpTipGreen}%
+  {bcpTipGreen}
+
+%% ─── 3. Warning / Caution ────────────────────────────────────────────────────
+\bcpDefineCallout{warningbox}%
+  {Warning}%
+  {\faExclamationTriangle}%
+  {bcpWarnBg}%
+  {bcpWarnAmber}%
+  {bcpWarnAmber}
+
+%% ─── 4. Danger / Critical ────────────────────────────────────────────────────
+\bcpDefineCallout{dangerbox}%
+  {Danger}%
+  {\faSkull}%
+  {bcpDangerBg}%
+  {bcpDangerRed}%
+  {bcpDangerRed}
+
+%% ─── 5. Exercise / Lab ───────────────────────────────────────────────────────
+\bcpDefineCallout{exercisebox}%
+  {Exercise}%
+  {\faFlask}%
+  {bcpExerciseBg}%
+  {bcpExerciseTeal}%
+  {bcpExerciseTeal}
+
+%% ─── 6. Definition / Concept ─────────────────────────────────────────────────
+\bcpDefineCallout{definitionbox}%
+  {Definition}%
+  {\faBook}%
+  {bcpDefBg}%
+  {bcpDefPurple}%
+  {bcpDefPurple}
+
+%% ─── 7. Example ──────────────────────────────────────────────────────────────
+\bcpDefineCallout{examplebox}%
+  {Example}%
+  {\faCode}%
+  {bcpExampleBg}%
+  {bcpExampleGray}%
+  {bcpExampleGray}
+
+%% ─── 8. Objectives / "In this chapter" ──────────────────────────────────────
+%% Slightly different layout: full-width accent top band, bullet list inside.
+\newenvironment{objectivesbox}[1][In this chapter]{%
+  \begin{tcolorbox}[
+    enhanced,
+    breakable,
+    arc           = 4pt,
+    boxrule       = 0.6pt,
+    colback       = bcpObjBg,
+    colframe      = bcpObjBorder,
+    colbacktitle  = bcpObjAccent,
+    coltitle      = white,
+    fonttitle     = {\sffamily\bfseries\small},
+    title         = {\faMapSigns\enspace#1},
+    attach boxed title to top left = {yshift=-\tcboxedtitleheight+1pt},
+    boxed title style = {
+      arc         = 2pt,
+      boxrule     = 0pt,
+      top         = 4pt,
+      bottom      = 4pt,
+      left        = 8pt,
+      right       = 8pt,
+    },
+    left          = 10pt,
+    right         = 10pt,
+    top           = 18pt,
+    bottom        = 8pt,
+    before skip   = 12pt plus 3pt,
+    after skip    = 12pt plus 3pt,
+    fontupper     = {\small},
+  ]%
+  \setlist[itemize]{
+    label         = \textcolor{bcpObjAccent}{\faCheckCircle},
+    leftmargin    = 1.2em,
+    topsep        = 2pt,
+    itemsep       = 3pt,
+  }%
+}{%
+  \end{tcolorbox}%
+}
+
+%% ─── 9. See Also / Cross-book reference ──────────────────────────────────────
+%% Used by bcpedu-crossref.sty's \seealsobook command.
+%% Can also be used directly:
+%%   \begin{seealsobox}[Kubernetes Book]
+%%     Chapter 3 — Deployments and Services
+%%   \end{seealsobox}
+%%
+\newenvironment{seealsobox}[1][See Also]{%
+  \begin{tcolorbox}[
+    bcpCalloutBase = {bcpSeeAlsoBorder},
+    colback        = bcpSeeAlsoBg,
+    colframe       = bcpSeeAlsoBorder,
+    coltitle       = bcpSeeAlsoOrange,
+    title          = {\faLink\enspace\textbf{#1}},
+  ]%
+}{%
+  \end{tcolorbox}%
+}
+
+%% ─── Convenience: chapter exercise box (numbered) ───────────────────────────
+%% A counter-based exercise box for end-of-chapter exercises.
+%% Reset per chapter automatically.
+\newcounter{bcpExercise}[chapter]
+\renewcommand{\thebcpExercise}{\thechapter.\arabic{bcpExercise}}
+
+\newenvironment{labexercise}[1][]{%
+  \refstepcounter{bcpExercise}%
+  \def\bcpLabTitle{#1}%
+  \begin{tcolorbox}[
+    enhanced,
+    breakable,
+    arc           = 3pt,
+    boxrule       = 0.6pt,
+    colback       = bcpExerciseBg,
+    colframe      = bcpExerciseBorder,
+    colbacktitle  = bcpExerciseTeal,
+    coltitle      = white,
+    fonttitle     = {\sffamily\bfseries\small},
+    title         = {%
+      \faFlask\enspace
+      Exercise \thebcpExercise%
+      \ifx\bcpLabTitle\empty\else\enspace---\enspace\bcpLabTitle\fi
+    },
+    attach boxed title to top left = {yshift=-\tcboxedtitleheight+1pt},
+    boxed title style = {
+      arc     = 2pt,
+      boxrule = 0pt,
+      top=4pt, bottom=4pt, left=8pt, right=8pt,
+    },
+    left=10pt, right=10pt, top=18pt, bottom=8pt,
+    before skip=12pt plus 3pt,
+    after skip=12pt plus 3pt,
+    fontupper={\small},
+  ]%
+}{%
+  \end{tcolorbox}%
+}
+
+\endinput

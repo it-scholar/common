@@ -1,0 +1,154 @@
+# =============================================================================
+# Makefile.common — Shared Build Rules for BCP Education Books
+# =============================================================================
+# Include this file from each book's Makefile:
+#
+#   BOOK_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+#   COMMON    := $(BOOK_ROOT)../../../common/latex
+#   include $(COMMON)/Makefile.common
+#
+# The book's Makefile may set the following variables BEFORE the include:
+#
+#   MAIN      := main            # root .tex filename (no extension) [default: main]
+#   TEXENGINE := xelatex         # xelatex or lualatex [default: xelatex]
+#   EXTRA_TEXINPUTS :=           # additional TEXINPUTS paths
+#
+# Targets exposed:
+#   make / make all      — build digital PDF (color)
+#   make digital         — build digital PDF (color)
+#   make print           — build print PDF (grayscale-safe)
+#   make clean           — remove auxiliary files
+#   make distclean       — remove all build artifacts including PDFs
+#   make watch           — live-rebuild on file changes (requires latexmk -pvc)
+#   make lint            — run lacheck (if available)
+# =============================================================================
+
+# ── Defaults (can be overridden by the book's Makefile before include) ────────
+MAIN      ?= main
+TEXENGINE ?= xelatex
+
+# ── Derived paths ─────────────────────────────────────────────────────────────
+# MAKEFILE_LIST includes this file as the last entry when included.
+# BOOK_DIR is the directory of the book's own Makefile (the first in the list).
+BOOK_MAKEFILE := $(firstword $(MAKEFILE_LIST))
+BOOK_DIR      := $(dir $(abspath $(BOOK_MAKEFILE)))
+COMMON_DIR    := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+# ── TEXINPUTS ─────────────────────────────────────────────────────────────────
+# Allows LaTeX to find bcpedu.cls and *.sty files in common/latex/.
+# The trailing : keeps the default search path active.
+TEXINPUTS_BASE := $(COMMON_DIR):$(BOOK_DIR):
+ifdef EXTRA_TEXINPUTS
+  TEXINPUTS_FULL := $(EXTRA_TEXINPUTS):$(TEXINPUTS_BASE):
+else
+  TEXINPUTS_FULL := $(TEXINPUTS_BASE):
+endif
+
+# ── latexmk flags ─────────────────────────────────────────────────────────────
+LATEXMK_FLAGS := \
+  -$(TEXENGINE) \
+  -shell-escape \
+  -interaction=nonstopmode \
+  -halt-on-error \
+  -file-line-error \
+  -bibtex \
+  -use-make
+
+# Index style file: copy from common to build dir so imakeidx finds it
+IST_SRC  := $(COMMON_DIR)bcpedu-index.ist
+IST_DEST := $(BOOK_DIR)bcpedu-index.ist
+
+# ── Output filenames ──────────────────────────────────────────────────────────
+DIGITAL_PDF := $(MAIN)-digital.pdf
+PRINT_PDF   := $(MAIN)-print.pdf
+
+# =============================================================================
+# Targets
+# =============================================================================
+
+.PHONY: all digital print clean distclean watch lint help
+
+## Default target: build digital PDF
+all: digital
+
+## digital — full-color PDF (default for screen/distribution)
+digital: _copy_ist
+	@echo "==> Building digital PDF: $(DIGITAL_PDF)"
+	TEXINPUTS="$(TEXINPUTS_FULL)" \
+	  latexmk $(LATEXMK_FLAGS) \
+	  -jobname=$(basename $(DIGITAL_PDF)) \
+	  -pretex="\PassOptionsToClass{digital}{bcpedu}" \
+	  -usepretex \
+	  $(MAIN).tex
+	@echo "==> Done: $(DIGITAL_PDF)"
+
+## print — grayscale-safe PDF (for print-on-demand services)
+print: _copy_ist
+	@echo "==> Building print PDF: $(PRINT_PDF)"
+	TEXINPUTS="$(TEXINPUTS_FULL)" \
+	  latexmk $(LATEXMK_FLAGS) \
+	  -jobname=$(basename $(PRINT_PDF)) \
+	  -pretex="\PassOptionsToClass{print}{bcpedu}" \
+	  -usepretex \
+	  $(MAIN).tex
+	@echo "==> Done: $(PRINT_PDF)"
+
+## watch — live rebuild on file changes (Ctrl-C to stop)
+watch: _copy_ist
+	@echo "==> Watching for changes (digital mode). Press Ctrl-C to stop."
+	TEXINPUTS="$(TEXINPUTS_FULL)" \
+	  latexmk $(LATEXMK_FLAGS) -pvc \
+	  -jobname=$(basename $(DIGITAL_PDF)) \
+	  -pretex="\PassOptionsToClass{digital}{bcpedu}" \
+	  -usepretex \
+	  $(MAIN).tex
+
+## lint — static analysis with lacheck (optional, may not be installed)
+lint:
+	@if command -v lacheck >/dev/null 2>&1; then \
+	  lacheck $(MAIN).tex; \
+	else \
+	  echo "lacheck not found — skipping lint"; \
+	fi
+
+## clean — remove auxiliary files, keep PDFs
+clean:
+	@echo "==> Cleaning auxiliary files"
+	latexmk -c $(MAIN).tex 2>/dev/null || true
+	rm -f *.aux *.log *.out *.toc *.lof *.lot *.lol \
+	      *.bbl *.bcf *.blg *.run.xml \
+	      *.idx *.ilg *.ind \
+	      *.glo *.gls *.glg *.ist \
+	      *.alg *.acr *.acn \
+	      *.fls *.fdb_latexmk \
+	      *.synctex.gz *.synctex\(busy\) \
+	      _minted-*/ svg-inkscape/ \
+	      $(IST_DEST) 2>/dev/null || true
+	@echo "==> Clean done"
+
+## distclean — remove ALL build artifacts including PDFs
+distclean: clean
+	@echo "==> Removing PDFs"
+	rm -f $(DIGITAL_PDF) $(PRINT_PDF) $(MAIN).pdf
+	@echo "==> Distclean done"
+
+## help — show available targets
+help:
+	@echo ""
+	@echo "BCP Education LaTeX Build System"
+	@echo "================================="
+	@echo ""
+	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## /  make /g'
+	@echo ""
+	@echo "Configuration:"
+	@echo "  MAIN      = $(MAIN)"
+	@echo "  TEXENGINE = $(TEXENGINE)"
+	@echo "  BOOK_DIR  = $(BOOK_DIR)"
+	@echo "  COMMON    = $(COMMON_DIR)"
+	@echo ""
+
+# ── Internal targets ──────────────────────────────────────────────────────────
+_copy_ist:
+	@if [ ! -f "$(IST_DEST)" ]; then \
+	  cp "$(IST_SRC)" "$(IST_DEST)" 2>/dev/null || true; \
+	fi

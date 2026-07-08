@@ -1,0 +1,104 @@
+%% =============================================================================
+%% bcpedu-fonts.sty — Typography for BCP Education Books
+%% =============================================================================
+%% Sets up OpenType fonts via fontspec (requires XeLaTeX or LuaLaTeX).
+%%
+%% Font stack:
+%%   Body:     IBM Plex Serif    — readable serif for long-form text
+%%   Sans:     IBM Plex Sans     — headings, callout titles, labels
+%%   Mono:     JetBrains Mono    — all code, terminal, inline code
+%%   Math:     STIX Two Math     — mathematical notation (fallback)
+%%
+%% All fonts are open-source.
+%% Install instructions: see common/latex/README.md
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-fonts}[2026/07/08 v1.0 BCP Education Typography]
+
+%% ─── fontspec ────────────────────────────────────────────────────────────────
+\RequirePackage{fontspec}
+
+%% Body font: IBM Plex Serif
+%% Excellent legibility at 11pt, strong italic, clear bold
+\setmainfont{IBM Plex Serif}[
+  UprightFont    = *-Regular,
+  BoldFont       = *-Bold,
+  ItalicFont     = *-Italic,
+  BoldItalicFont = *-BoldItalic,
+  Numbers        = {OldStyle, Proportional},
+  Ligatures      = TeX,
+]
+
+%% Sans-serif: IBM Plex Sans
+%% Used for headings, callout titles, running headers, captions
+\setsansfont{IBM Plex Sans}[
+  UprightFont    = *-Regular,
+  BoldFont       = *-Bold,
+  ItalicFont     = *-Italic,
+  BoldItalicFont = *-BoldItalic,
+  Numbers        = {Lining, Proportional},
+  Ligatures      = TeX,
+]
+
+%% Monospace: JetBrains Mono
+%% All code, terminal, inline \code{} — ligature-rich, clear at small sizes
+\setmonofont{JetBrains Mono}[
+  UprightFont    = *-Regular,
+  BoldFont       = *-Bold,
+  ItalicFont     = *-Italic,
+  BoldItalicFont = *-BoldItalic,
+  Scale          = 0.88,        % slightly smaller than body for visual harmony
+  Ligatures      = TeX,
+  Contextuals    = Alternate,   % enables programming ligatures (-> => etc.)
+]
+
+%% ─── Math font ───────────────────────────────────────────────────────────────
+%% STIX Two Math is a high-quality open-source math font.
+%% Only loaded if unicode-math is available (it usually is with XeLaTeX/LuaLaTeX).
+\RequirePackage{unicode-math}
+\setmathfont{STIX Two Math}[
+  Scale = MatchUppercase,
+]
+
+%% ─── Microtype ───────────────────────────────────────────────────────────────
+%% Enables character protrusion, font expansion, and kerning.
+%% Reduces overfull hboxes significantly in technical text.
+\RequirePackage[
+  final,
+  tracking  = true,
+  kerning   = true,
+  spacing   = true,
+  factor    = 1100,
+  stretch   = 10,
+  shrink    = 10,
+]{microtype}
+
+%% ─── Line spacing ────────────────────────────────────────────────────────────
+\RequirePackage{setspace}
+\setstretch{1.15}   % slightly open for readability without wasting vertical space
+
+%% ─── Font size scale ─────────────────────────────────────────────────────────
+%% Convenience commands for consistent heading font sizes.
+%% These mirror the modular scale 11 × 1.25: 11 → 13.75 → 17.2 → 21.5 → 26.9
+\newcommand{\fontScaleS}  {\fontsize{9pt}{11pt}\selectfont}
+\newcommand{\fontScaleM}  {\fontsize{11pt}{14pt}\selectfont}    % = base
+\newcommand{\fontScaleL}  {\fontsize{13.8pt}{17pt}\selectfont}
+\newcommand{\fontScaleXL} {\fontsize{17.2pt}{21pt}\selectfont}
+\newcommand{\fontScaleXXL}{\fontsize{21.5pt}{26pt}\selectfont}
+\newcommand{\fontScaleH}  {\fontsize{26.9pt}{32pt}\selectfont}  % chapter number
+
+%% ─── Inline code command ─────────────────────────────────────────────────────
+%% \code{git commit -m "msg"} — renders in JetBrains Mono with accent-colored bg.
+%% For longer inline snippets. Defined here so it's available everywhere.
+\RequirePackage{xcolor}   % already loaded via bcpedu-colors, but listed for clarity
+
+\newcommand{\code}[1]{%
+  \texttt{\textcolor{bcpAccentDark}{\small #1}}%
+}
+
+%% ─── URL styling ─────────────────────────────────────────────────────────────
+\RequirePackage{url}
+\urlstyle{same}   % URLs in the same font as surrounding text (via monofont)
+
+\endinput

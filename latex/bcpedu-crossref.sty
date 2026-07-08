@@ -1,0 +1,157 @@
+%% =============================================================================
+%% bcpedu-crossref.sty — Cross-Book References and Hyperlinks
+%% =============================================================================
+%% Handles three types of cross-book navigation:
+%%
+%%   \seealsobook{Book Title}{Chapter/Section ref}{Short description}
+%%     Renders a "See Also" callout box — works in print and digital.
+%%
+%%   \bookhref[Chapter]{URL}{Book Title}
+%%     Digital: clickable hyperlink styled as an inline book reference.
+%%     Print:   plain text with URL in a footnote.
+%%
+%%   \qrlink{URL}{Label}
+%%     Digital: suppressed (just renders the label as text).
+%%     Print:   renders a QR code with the label below it (inline).
+%%
+%% Also configures:
+%%   - hyperref (digital: colored links; print: hidelinks)
+%%   - PDF metadata (set from book metadata commands in bcpedu.cls)
+%%
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-crossref}[2026/07/08 v1.0 BCP Education Cross-References]
+
+\RequirePackage{ifthen}
+\RequirePackage{xparse}
+
+%% ─── hyperref ────────────────────────────────────────────────────────────────
+%% Must be loaded late (after most other packages).
+%% Digital: colored links. Print: invisible links (text unchanged, no color).
+\if@bcpprint
+  \RequirePackage[
+    hidelinks,
+    bookmarks        = true,
+    bookmarksnumbered= true,
+    bookmarksopen    = true,
+    pdfpagelabels    = true,
+    pdfdisplaydoctitle = true,
+    unicode          = true,
+    pdfencoding      = auto,
+  ]{hyperref}
+\else
+  \RequirePackage[
+    colorlinks       = true,
+    linkcolor        = bcpAccent,
+    urlcolor         = bcpAccentMid,
+    citecolor        = bcpTipGreen,
+    filecolor        = bcpExerciseTeal,
+    bookmarks        = true,
+    bookmarksnumbered= true,
+    bookmarksopen    = true,
+    pdfpagelabels    = true,
+    pdfdisplaydoctitle = true,
+    unicode          = true,
+    pdfencoding      = auto,
+  ]{hyperref}
+\fi
+
+%% ─── QR code package ─────────────────────────────────────────────────────────
+%% Only rendered in print mode. In digital, just show the label.
+\if@bcpprint
+  \RequirePackage{qrcode}
+\fi
+
+%% ─── \seealsobook ────────────────────────────────────────────────────────────
+%% Renders a See Also callout box pointing to another BCP Education book.
+%%
+%% Usage:
+%%   \seealsobook{Docker Fundamentals}{Chapter 4 — Images and Layers}%
+%%     {Covers the build context and image layering in detail.}
+%%
+%% Rendered as the seealsobox environment from bcpedu-callouts.sty.
+%%
+\NewDocumentCommand{\seealsobook}{ m m m }{%
+  \begin{seealsobox}[#1]%
+    \textbf{#2}\\[2pt]%
+    \small #3%
+  \end{seealsobox}%
+}
+
+%% ─── \bookhref ───────────────────────────────────────────────────────────────
+%% Inline reference to another book, optionally with a specific chapter.
+%%
+%% Usage:
+%%   \bookhref{https://books.bcpedu.com/docker}{Docker Fundamentals}[Chapter 4]
+%%
+%% Digital: "Docker Fundamentals (Chapter 4)" as a hyperlink.
+%% Print:   "Docker Fundamentals (Chapter 4)" as plain text + footnote with URL.
+%%
+\NewDocumentCommand{\bookhref}{ m m O{} }{%
+  \if@bcpprint
+    % Print: text + footnote
+    \emph{#2}%
+    \ifx\\#3\\\else\ (#3)\fi%
+    \footnote{\url{#1}}%
+  \else
+    % Digital: hyperlink
+    \href{#1}{%
+      \emph{#2}%
+      \ifx\\#3\\\else\ (#3)\fi%
+    }%
+  \fi
+}
+
+%% ─── \qrlink ─────────────────────────────────────────────────────────────────
+%% Renders a QR code (print only) or just the label text (digital).
+%% Intended for inline use or in margins.
+%%
+%% Usage:
+%%   \qrlink{https://books.bcpedu.com/docker}{Docker Fundamentals}
+%%
+\NewDocumentCommand{\qrlink}{ m m }{%
+  \if@bcpprint
+    \begin{center}
+      \qrcode[height=2cm]{#1}\\[4pt]
+      \small\sffamily\textcolor{bcpTextLight}{#2}
+    \end{center}
+  \else
+    \href{#1}{#2}%
+  \fi
+}
+
+%% ─── Internal chapter cross-reference helpers ────────────────────────────────
+%% For references within the same book.
+
+%% \chapterref{label} — "Chapter N" with hyperlink
+\NewDocumentCommand{\chapterref}{ m }{%
+  \hyperref[#1]{Chapter~\ref*{#1}}%
+}
+
+%% \sectionref{label} — "Section N.M" with hyperlink
+\NewDocumentCommand{\sectionref}{ m }{%
+  \hyperref[#1]{Section~\ref*{#1}}%
+}
+
+%% \figureref{label} — "Figure N.M" with hyperlink
+\NewDocumentCommand{\figureref}{ m }{%
+  \hyperref[#1]{Figure~\ref*{#1}}%
+}
+
+%% \tableref{label} — "Table N.M" with hyperlink
+\NewDocumentCommand{\tableref}{ m }{%
+  \hyperref[#1]{Table~\ref*{#1}}%
+}
+
+%% \listingref{label} — "Listing N.M" with hyperlink
+\NewDocumentCommand{\listingref}{ m }{%
+  \hyperref[#1]{Listing~\ref*{#1}}%
+}
+
+%% \exerciseref{label} — "Exercise N.M" with hyperlink
+\NewDocumentCommand{\exerciseref}{ m }{%
+  \hyperref[#1]{Exercise~\ref*{#1}}%
+}
+
+\endinput
