@@ -130,7 +130,8 @@
   {bcpExampleGray}
 
 %% ─── 8. Objectives / "In this chapter" ──────────────────────────────────────
-%% Slightly different layout: full-width accent top band, bullet list inside.
+%% Full-width gold title band, bullet list inside.
+%% Uses tcolorbox built-in title (not floating boxed title) to prevent overlap.
 \newenvironment{objectivesbox}[1][In this chapter]{%
   \begin{tcolorbox}[
     enhanced,
@@ -143,18 +144,14 @@
     coltitle      = white,
     fonttitle     = {\sffamily\bfseries\small},
     title         = {\faMapSigns\enspace#1},
-    attach boxed title to top left = {yshift=-\tcboxedtitleheight+1pt},
-    boxed title style = {
-      arc         = 2pt,
-      boxrule     = 0pt,
-      top         = 4pt,
-      bottom      = 4pt,
-      left        = 8pt,
-      right       = 8pt,
-    },
+    toptitle      = 6pt,
+    bottomtitle   = 6pt,
+    lefttitle     = 10pt,
+    righttitle    = 10pt,
+    titlerule     = 0pt,
     left          = 10pt,
     right         = 10pt,
-    top           = 18pt,
+    top           = 6pt,
     bottom        = 8pt,
     before skip   = 12pt plus 3pt,
     after skip    = 12pt plus 3pt,
