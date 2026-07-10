@@ -51,12 +51,13 @@
 ]
 
 %% ─── Microtype ───────────────────────────────────────────────────────────────
-%% With XeLaTeX, microtype supports protrusion and tracking.
-%% expansion/spacing/kerning are pdfTeX-only; omitting them avoids errors.
+%% XeLaTeX supports protrusion only; tracking requires pdftex 1.40+.
+%% Disable tracking explicitly so older microtype (TeX Live 2023) does not
+%% raise a fatal error on XeTeX.
 \RequirePackage[
   final,
   protrusion = true,
-  tracking   = true,
+  tracking   = false,
 ]{microtype}
 
 %% ─── Line spacing ────────────────────────────────────────────────────────────
