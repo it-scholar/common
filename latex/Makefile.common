@@ -105,9 +105,11 @@ watch: _ensure_outdir _copy_ist
 	  $(MAIN).tex
 
 ## lint — static analysis with lacheck (optional, may not be installed)
+## Uses a wrapper to suppress spurious warnings inside BCP custom verbatim
+## environments (codeblock, codefile, terminalin, terminalout, labexercise).
 lint:
 	@if command -v lacheck >/dev/null 2>&1; then \
-	  lacheck $(MAIN).tex; \
+	  python3 $(COMMON_DIR)lacheck-wrapper.py $(MAIN).tex; \
 	else \
 	  echo "lacheck not found — skipping lint"; \
 	fi
