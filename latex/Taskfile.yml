@@ -116,7 +116,7 @@ tasks:
         *.glo *.gls *.glg *.acn *.acr *.alg
         *.fls *.fdb_latexmk *.synctex.gz *.synctex\(busy\)
         *.listing *.minted *.xdv *.pdf
-        "{{.COMMON_DIR}}/bcpedu-index.ist" 2>/dev/null || true
+        2>/dev/null || true
       - rm -rf svg-inkscape/
       - echo "==> Clean done"
 
