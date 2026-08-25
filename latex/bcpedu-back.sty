@@ -91,7 +91,12 @@
 }
 
 %% ─── Index with imakeidx ─────────────────────────────────────────────────────
-\RequirePackage{imakeidx}
+%% noautomatic: disable imakeidx's own \write18 auto-invocation of makeindex.
+%% latexmk's built-in makeindex rule (see latexmkrc) handles the .idx -> .ind
+%% conversion instead, which plays more reliably with tcolorbox/minted in the
+%% same document (imakeidx's own auto-invocation was found to race/conflict
+%% with tcolorbox's minted listing-file handling).
+\RequirePackage[noautomatic]{imakeidx}
 
 \makeindex[
   columns   = 2,

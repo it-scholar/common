@@ -56,10 +56,11 @@ tasks:
       - >-
         TEXINPUTS="{{.TEXINPUTS_FULL}}"
         latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
-        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
-        -output-directory={{.OUT_DIR}} -jobname={{.MAIN}}-digital
+        -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -jobname={{.MAIN}}-digital
         -pretex="\PassOptionsToClass{digital}{bcpedu}" -usepretex
         {{.MAIN}}.tex
+      - mv -f "{{.MAIN}}-digital.pdf" "{{.DIGITAL_PDF}}"
       - 'echo "==> Done: {{.DIGITAL_PDF}}"'
 
   print:
@@ -70,10 +71,11 @@ tasks:
       - >-
         TEXINPUTS="{{.TEXINPUTS_FULL}}"
         latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
-        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
-        -output-directory={{.OUT_DIR}} -jobname={{.MAIN}}-print
+        -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -jobname={{.MAIN}}-print
         -pretex="\PassOptionsToClass{print}{bcpedu}" -usepretex
         {{.MAIN}}.tex
+      - mv -f "{{.MAIN}}-print.pdf" "{{.PRINT_PDF}}"
       - 'echo "==> Done: {{.PRINT_PDF}}"'
 
   watch:
@@ -81,11 +83,12 @@ tasks:
     deps: [_ensure_outdir, _copy_ist]
     cmds:
       - echo "==> Watching for changes (digital mode). Press Ctrl-C to stop."
+      - echo "==> PDF will be at ./{{.MAIN}}-digital.pdf (book root) while watching"
       - >-
         TEXINPUTS="{{.TEXINPUTS_FULL}}"
         latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
-        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
-        -output-directory={{.OUT_DIR}} -pvc -jobname={{.MAIN}}-digital
+        -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -pvc -jobname={{.MAIN}}-digital
         -pretex="\PassOptionsToClass{digital}{bcpedu}" -usepretex
         {{.MAIN}}.tex
 
@@ -106,8 +109,8 @@ tasks:
       - >-
         TEXINPUTS="{{.TEXINPUTS_FULL}}"
         latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
-        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
-        -output-directory={{.OUT_DIR}} -c {{.MAIN}}.tex || true
+        -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -c {{.MAIN}}.tex || true
       - rm -rf "{{.OUT_DIR}}" _minted/
       - >-
         rm -f *.aux *.log *.out *.toc *.lof *.lot *.lol
@@ -136,4 +139,4 @@ tasks:
     status:
       - test -f bcpedu-index.ist
     cmds:
-      - cp "{{.COMMON_DIR}}/bcpedu-index.ist" ./bcpedu-index.ist 2>/dev/null || true
+      - cp "{{.COMMON_DIR}}/bcpedu-index.ist" ./bcpedu-index.ist

@@ -11,8 +11,9 @@ $bibtex_use = 2;
 # ── Glossaries (glossaries-extra) ─────────────────────────────────────────────
 # .glo → .gls  (main glossary)
 # .acn → .acr  (acronym list)
-# When -output-directory=out is used, latexmk passes $_[0] as 'out/jobname'
-# (full path). makeglossaries needs the directory (-d) and base name split.
+# Builds run in the book's own directory (no -output-directory), so $_[0] is
+# normally just the jobname, but keep the path-splitting logic in case a
+# directory-qualified name is ever passed.
 add_cus_dep('glo', 'gls', 0, 'run_makeglossaries');
 add_cus_dep('acn', 'acr', 0, 'run_makeglossaries');
 
