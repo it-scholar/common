@@ -1,0 +1,139 @@
+# =============================================================================
+# Taskfile.yml — Shared Build Rules for BCP Education Books
+# =============================================================================
+# Included from each book's Taskfile.yml:
+#
+#   includes:
+#     book:
+#       taskfile: ../../common/latex/Taskfile.yml   # 2 ups: books/<name> -> repo root -> common
+#       flatten: true
+#       vars:
+#         MAIN: main            # root .tex filename (no extension) [default: main]
+#         TEXENGINE: xelatex    # xelatex or lualatex [default: xelatex]
+#         OUT_DIR: out          # [default: out]
+#
+# No dir: is set on the include, so these tasks run in the including book's own
+# directory (Task's documented default for includes) - equivalent to Make's
+# CURDIR-relative `include`.
+#
+# Tasks exposed (flattened, so callable as `task digital` etc. from the book dir):
+#   task / task digital   — build digital PDF (color)
+#   task print            — build print PDF (grayscale-safe)
+#   task clean            — remove auxiliary files
+#   task distclean        — remove all build artifacts including PDFs
+#   task watch            — live-rebuild on file changes (requires latexmk -pvc)
+#   task lint             — run lacheck (if available)
+# =============================================================================
+
+version: "3"
+
+vars:
+  MAIN: '{{.MAIN | default "main"}}'
+  TEXENGINE: '{{.TEXENGINE | default "xelatex"}}'
+  OUT_DIR: '{{.OUT_DIR | default "out"}}'
+  EXTRA_TEXINPUTS: '{{.EXTRA_TEXINPUTS | default ""}}'
+  # Absolute path of this Taskfile's own directory (common/latex), regardless
+  # of which book includes it.
+  COMMON_DIR: "{{.TASKFILE_DIR}}"
+  # No dir: override on the include means these tasks run in the book's own
+  # directory (Task's documented default) - $PWD at runtime is the book dir.
+  TEXINPUTS_FULL: >-
+    {{if .EXTRA_TEXINPUTS}}{{.EXTRA_TEXINPUTS}}:{{end}}{{.COMMON_DIR}}:$PWD:
+  DIGITAL_PDF: "{{.OUT_DIR}}/{{.MAIN}}-digital.pdf"
+  PRINT_PDF: "{{.OUT_DIR}}/{{.MAIN}}-print.pdf"
+
+tasks:
+  default:
+    desc: Build the digital (color) PDF
+    cmds:
+      - task: digital
+
+  digital:
+    desc: Build the digital (color) PDF
+    deps: [_ensure_outdir, _copy_ist]
+    cmds:
+      - echo "==> Building digital PDF: {{.DIGITAL_PDF}}"
+      - >-
+        TEXINPUTS="{{.TEXINPUTS_FULL}}"
+        latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
+        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -output-directory={{.OUT_DIR}} -jobname={{.MAIN}}-digital
+        -pretex="\PassOptionsToClass{digital}{bcpedu}" -usepretex
+        {{.MAIN}}.tex
+      - echo "==> Done: {{.DIGITAL_PDF}}"
+
+  print:
+    desc: Build the print (grayscale-safe) PDF
+    deps: [_ensure_outdir, _copy_ist]
+    cmds:
+      - echo "==> Building print PDF: {{.PRINT_PDF}}"
+      - >-
+        TEXINPUTS="{{.TEXINPUTS_FULL}}"
+        latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
+        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -output-directory={{.OUT_DIR}} -jobname={{.MAIN}}-print
+        -pretex="\PassOptionsToClass{print}{bcpedu}" -usepretex
+        {{.MAIN}}.tex
+      - echo "==> Done: {{.PRINT_PDF}}"
+
+  watch:
+    desc: Live-rebuild the digital PDF on file changes (Ctrl-C to stop)
+    deps: [_ensure_outdir, _copy_ist]
+    cmds:
+      - echo "==> Watching for changes (digital mode). Press Ctrl-C to stop."
+      - >-
+        TEXINPUTS="{{.TEXINPUTS_FULL}}"
+        latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
+        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -output-directory={{.OUT_DIR}} -pvc -jobname={{.MAIN}}-digital
+        -pretex="\PassOptionsToClass{digital}{bcpedu}" -usepretex
+        {{.MAIN}}.tex
+
+  lint:
+    desc: Static analysis with lacheck (optional, may not be installed)
+    cmds:
+      - |
+        if command -v lacheck >/dev/null 2>&1; then
+          python3 "{{.COMMON_DIR}}/lacheck-wrapper.py" "{{.MAIN}}.tex"
+        else
+          echo "lacheck not found — skipping lint"
+        fi
+
+  clean:
+    desc: Remove all build artifacts (out/ + any stray root-level files)
+    cmds:
+      - echo "==> Cleaning auxiliary files"
+      - >-
+        TEXINPUTS="{{.TEXINPUTS_FULL}}"
+        latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
+        -halt-on-error -file-line-error -r {{.COMMON_DIR}}/latexmkrc
+        -output-directory={{.OUT_DIR}} -c {{.MAIN}}.tex || true
+      - rm -rf "{{.OUT_DIR}}" _minted/
+      - >-
+        rm -f *.aux *.log *.out *.toc *.lof *.lot *.lol
+        *.bbl *.bcf *.blg *.run.xml *.bcf-SAVE-ERROR *.bbl-SAVE-ERROR
+        *.idx *.ilg *.ind *.ist
+        *.glo *.gls *.glg *.acn *.acr *.alg
+        *.fls *.fdb_latexmk *.synctex.gz *.synctex\(busy\)
+        *.listing *.minted *.xdv *.pdf
+        "{{.COMMON_DIR}}/bcpedu-index.ist" 2>/dev/null || true
+      - rm -rf svg-inkscape/
+      - echo "==> Clean done"
+
+  distclean:
+    desc: Alias for clean (out/ holds everything, including PDFs)
+    cmds:
+      - task: clean
+      - echo "==> Distclean done"
+
+  _ensure_outdir:
+    internal: true
+    cmds:
+      - mkdir -p "{{.OUT_DIR}}"
+
+  _copy_ist:
+    internal: true
+    status:
+      - test -f bcpedu-index.ist
+    cmds:
+      - cp "{{.COMMON_DIR}}/bcpedu-index.ist" ./bcpedu-index.ist 2>/dev/null || true
