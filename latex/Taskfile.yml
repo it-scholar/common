@@ -52,7 +52,7 @@ tasks:
     desc: Build the digital (color) PDF
     deps: [_ensure_outdir, _copy_ist]
     cmds:
-      - echo "==> Building digital PDF: {{.DIGITAL_PDF}}"
+      - 'echo "==> Building digital PDF: {{.DIGITAL_PDF}}"'
       - >-
         TEXINPUTS="{{.TEXINPUTS_FULL}}"
         latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
@@ -60,13 +60,13 @@ tasks:
         -output-directory={{.OUT_DIR}} -jobname={{.MAIN}}-digital
         -pretex="\PassOptionsToClass{digital}{bcpedu}" -usepretex
         {{.MAIN}}.tex
-      - echo "==> Done: {{.DIGITAL_PDF}}"
+      - 'echo "==> Done: {{.DIGITAL_PDF}}"'
 
   print:
     desc: Build the print (grayscale-safe) PDF
     deps: [_ensure_outdir, _copy_ist]
     cmds:
-      - echo "==> Building print PDF: {{.PRINT_PDF}}"
+      - 'echo "==> Building print PDF: {{.PRINT_PDF}}"'
       - >-
         TEXINPUTS="{{.TEXINPUTS_FULL}}"
         latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
@@ -74,7 +74,7 @@ tasks:
         -output-directory={{.OUT_DIR}} -jobname={{.MAIN}}-print
         -pretex="\PassOptionsToClass{print}{bcpedu}" -usepretex
         {{.MAIN}}.tex
-      - echo "==> Done: {{.PRINT_PDF}}"
+      - 'echo "==> Done: {{.PRINT_PDF}}"'
 
   watch:
     desc: Live-rebuild the digital PDF on file changes (Ctrl-C to stop)
