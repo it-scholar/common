@@ -43,8 +43,8 @@
     right         = 10pt,
     top           = 8pt,
     bottom        = 8pt,
-    before skip   = 12pt plus 3pt,
-    after skip    = 12pt plus 3pt,
+    before skip   = 4pt plus 2pt,
+    after skip    = 10pt plus 3pt,
     fonttitle     = {\sffamily\bfseries\small},
     attach title to upper = {\par\vspace{2pt}},
     fontupper     = {\small\setstretch{1.1}},
@@ -203,22 +203,21 @@
     colback       = bcpExerciseBg,
     colframe      = bcpExerciseBorder,
     colbacktitle  = bcpExerciseTeal,
-    coltitle      = white,
+    coltitle      = bcpExerciseTitleFg,
     fonttitle     = {\sffamily\bfseries\small},
     title         = {%
       \faFlask\enspace
       Exercise \thebcpExercise%
       \ifx\bcpLabTitle\empty\else\enspace---\enspace\bcpLabTitle\fi
     },
-    attach boxed title to top left = {yshift=-\tcboxedtitleheight+1pt},
-    boxed title style = {
-      arc     = 2pt,
-      boxrule = 0pt,
-      top=4pt, bottom=4pt, left=8pt, right=8pt,
-    },
-    left=10pt, right=10pt, top=18pt, bottom=8pt,
-    before skip=12pt plus 3pt,
-    after skip=12pt plus 3pt,
+    titlerule     = 0pt,
+    toptitle      = 4pt,
+    bottomtitle   = 4pt,
+    lefttitle     = 10pt,
+    righttitle    = 10pt,
+    left=10pt, right=10pt, top=8pt, bottom=8pt,
+    before skip=4pt plus 2pt,
+    after skip=10pt plus 3pt,
     fontupper={\small},
   ]%
 }{%

@@ -102,11 +102,18 @@
   bcpCodeBase,
   listing engine  = minted,
   listing only,
+  %% Slightly narrower than the available line width so nested boxes keep a
+  %% small inset from the parent frame.  \dimexpr is safe here (no tcb width).
+  width         = \dimexpr\linewidth-16pt\relax,
+  left          = 2pt,
+  right         = 2pt,
   minted language = {#1},
   %% xleftmargin gives line numbers their space inside the frame.
   %% numbersep controls the gap between number and code text.
+  %% 2em accommodates 2-digit line numbers (up to 99) comfortably.
   minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4,
-                     breaklines=true, xleftmargin=2em, numbersep=8pt},
+                     breaklines=true, breakanywhere=true, breakautoindent=false,
+                     xleftmargin=2em, numbersep=6pt},
   %% Redefine \theFancyVerbLine just before content is typeset so line numbers
   %% are non-copyable in the output PDF.
   before upper    = {%
@@ -199,8 +206,8 @@
   colframe        = bcpTermOutBg,
   coltext         = bcpTermOutFg,
   coltitle        = bcpTermOutFg,
-  colbacktitle    = black!70,
-  borderline west = {4pt}{0pt}{black!35},
+  colbacktitle    = black,
+  borderline west = {4pt}{0pt}{purple!50},
   title           = {{\small\color{bcpTermOutFg!70!black}\faAngleRight\faAngleRight}\enspace
                      \textbf{Output}%
                      \ifblank{#1}{}{\enspace{\color{bcpTermOutFg!50!black}\small---\enspace#1}}},
