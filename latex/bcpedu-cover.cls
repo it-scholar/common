@@ -51,6 +51,7 @@
 \PassOptionsToPackage{digital}{bcpedu-colors}
 \RequirePackage{bcpedu-colors}
 \RequirePackage{bcpedu-fonts}
+\RequirePackage{bcpedu-cover-emblems}
 
 %% ─── Book identity metadata ───────────────────────────────────────────────────
 %% Mirrors the commands in bcpedu.cls (kept in sync by convention, not by
@@ -85,6 +86,11 @@
 %% Optional per-book hooks - both OFF by default (pure typographic/geometric cover).
 \newcommand{\@coverimagepath}{}
 \NewDocumentCommand{\coverimage}{m}{\renewcommand{\@coverimagepath}{#1}}
+
+%% Named subject emblem defined in bcpedu-cover-emblems.sty, e.g. \coveremblem{kubernetes}.
+%% Ignored if \coverimage is also set; falls back to the generic mark if unknown.
+\newcommand{\@coveremblemname}{}
+\NewDocumentCommand{\coveremblem}{m}{\renewcommand{\@coveremblemname}{#1}}
 
 \newcommand{\@coverbadgepath}{}
 \NewDocumentCommand{\coverbadge}{m}{\renewcommand{\@coverbadgepath}{#1}}
@@ -167,15 +173,27 @@
 %% a small "moon" dot, a few star dots); if \coverimage is set, that graphic is
 %% clipped into the same circle instead - so book-specific art always reads as
 %% part of the same family device rather than a full-bleed photo.
+\newcommand{\bcpDrawEmblemDefault}[2]{%
+  \fill[bcpAccent]
+    ([xshift=#1+0.55*\bcpemblemr, yshift=#2+0.6*\bcpemblemr]current page.north west) circle (0.14in);
+  \foreach \bcpsx/\bcpsy in {-0.5/0.68, -0.12/0.88, 0.35/0.55} {%
+    \fill[bcpCoverTextMuted, opacity=0.75]
+      ([xshift=#1+\bcpsx*\bcpemblemr, yshift=#2+\bcpsy*\bcpemblemr]current page.north west) circle (0.8pt);
+  }%
+}
+
 \newcommand{\bcpDrawEmblem}[2]{%
   \ifdefempty{\@coverimagepath}{%
     \draw[bcpCoverTextMuted, line width=0.9pt]
       ([xshift=#1, yshift=#2]current page.north west) circle (\bcpemblemr);
-    \fill[bcpAccent]
-      ([xshift=#1+0.55*\bcpemblemr, yshift=#2+0.6*\bcpemblemr]current page.north west) circle (0.14in);
-    \foreach \bcpsx/\bcpsy in {-0.5/0.68, -0.12/0.88, 0.35/0.55} {%
-      \fill[bcpCoverTextMuted, opacity=0.75]
-        ([xshift=#1+\bcpsx*\bcpemblemr, yshift=#2+\bcpsy*\bcpemblemr]current page.north west) circle (0.8pt);
+    \ifdefempty{\@coveremblemname}{%
+      \bcpDrawEmblemDefault{#1}{#2}%
+    }{%
+      \@ifundefined{bcpEmblem@\@coveremblemname}{%
+        \bcpDrawEmblemDefault{#1}{#2}%
+      }{%
+        \csname bcpEmblem@\@coveremblemname\endcsname{#1}{#2}%
+      }%
     }%
   }{%
     \begin{scope}

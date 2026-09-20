@@ -1,0 +1,122 @@
+%% =============================================================================
+%% bcpedu-cover-emblems.sty — Subject-Specific Cover Emblems
+%% =============================================================================
+%% Named, original abstract line-art marks for \coveremblem{<name>} in
+%% bcpedu-cover.cls - one per course under courses/, drawn in the same
+%% hairline/dot vocabulary as the class's default emblem so every cover still
+%% reads as one family. None of these reproduce any project's actual
+%% trademarked logo; each is an original abstraction of its subject.
+%%
+%% Each \bcpEmblem@<name> takes the same 2 args as \bcpDrawEmblem's content
+%% dispatch: #1/#2 are the emblem center's xshift/yshift from the page's
+%% north west corner (matching \bcpDrawEmblem's own coordinate convention).
+%% The surrounding ring circle is drawn by \bcpDrawEmblem itself, not here.
+%% =============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bcpedu-cover-emblems}[2026/09/20 v1.0 BCP Education Cover Emblems]
+
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+
+%% ellipse's "x and y" radius syntax parses each side as a bare length, not a
+%% pgfmath expression - precompute scaled radii into these registers first.
+\newlength{\bcpqtRA}
+\newlength{\bcpqtRB}
+
+%% git — trunk line with a short branch spur and a merge/head dot.
+\newcommand{\bcpEmblem@git}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \draw[bcpCoverTextMuted, line width=0.9pt]
+    ($(bcpEC)+(0,-0.6*\bcpemblemr)$) -- ($(bcpEC)+(0,0.6*\bcpemblemr)$);
+  \draw[bcpCoverTextMuted, line width=0.9pt]
+    ($(bcpEC)+(0,-0.15*\bcpemblemr)$) -- ($(bcpEC)+(-0.55*\bcpemblemr,-0.4*\bcpemblemr)$);
+  \fill[bcpCoverTextMuted] ($(bcpEC)+(0,-0.6*\bcpemblemr)$) circle (1.8pt);
+  \fill[bcpCoverTextMuted] ($(bcpEC)+(-0.55*\bcpemblemr,-0.4*\bcpemblemr)$) circle (1.8pt);
+  \fill[bcpAccent] ($(bcpEC)+(0,0.6*\bcpemblemr)$) circle (0.1in);
+}
+
+%% docker — three stacked, offset rounded-rect "crates".
+\newcommand{\bcpEmblem@docker}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \draw[bcpCoverTextMuted, line width=0.9pt, rounded corners=1.5pt]
+    ($(bcpEC)+(-0.5*\bcpemblemr,-0.62*\bcpemblemr)$) rectangle ($(bcpEC)+(0.08*\bcpemblemr,-0.32*\bcpemblemr)$);
+  \draw[bcpCoverTextMuted, line width=0.9pt, rounded corners=1.5pt]
+    ($(bcpEC)+(-0.34*\bcpemblemr,-0.2*\bcpemblemr)$) rectangle ($(bcpEC)+(0.24*\bcpemblemr,0.1*\bcpemblemr)$);
+  \draw[bcpAccent, line width=0.9pt, rounded corners=1.5pt]
+    ($(bcpEC)+(-0.18*\bcpemblemr,0.22*\bcpemblemr)$) rectangle ($(bcpEC)+(0.4*\bcpemblemr,0.52*\bcpemblemr)$);
+}
+
+%% kubernetes — hub-and-spoke wheel (6 spokes, deliberately not the real 7-spoke helm).
+\newcommand{\bcpEmblem@kubernetes}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \foreach \bcpang in {0,60,...,300} {%
+    \draw[bcpCoverTextMuted, line width=0.9pt] (bcpEC) -- ($(bcpEC)+(\bcpang:0.62*\bcpemblemr)$);
+    \fill[bcpCoverTextMuted] ($(bcpEC)+(\bcpang:0.62*\bcpemblemr)$) circle (1.6pt);
+  }%
+  \fill[bcpAccent] (bcpEC) circle (0.1in);
+}
+
+%% terraform — three stacked flattened-diamond "layers" (infrastructure strata).
+\newcommand{\bcpEmblem@terraform}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \draw[bcpCoverTextMuted, line width=0.9pt]
+    ($(bcpEC)+(-0.5*\bcpemblemr,-0.5*\bcpemblemr)$) -- ($(bcpEC)+(0,-0.32*\bcpemblemr)$)
+    -- ($(bcpEC)+(0.5*\bcpemblemr,-0.5*\bcpemblemr)$) -- ($(bcpEC)+(0,-0.68*\bcpemblemr)$) -- cycle;
+  \draw[bcpCoverTextMuted, line width=0.9pt]
+    ($(bcpEC)+(-0.5*\bcpemblemr,-0.05*\bcpemblemr)$) -- ($(bcpEC)+(0,0.13*\bcpemblemr)$)
+    -- ($(bcpEC)+(0.5*\bcpemblemr,-0.05*\bcpemblemr)$) -- ($(bcpEC)+(0,-0.23*\bcpemblemr)$) -- cycle;
+  \draw[bcpAccent, line width=0.9pt]
+    ($(bcpEC)+(-0.5*\bcpemblemr,0.4*\bcpemblemr)$) -- ($(bcpEC)+(0,0.58*\bcpemblemr)$)
+    -- ($(bcpEC)+(0.5*\bcpemblemr,0.4*\bcpemblemr)$) -- ($(bcpEC)+(0,0.22*\bcpemblemr)$) -- cycle;
+}
+
+%% puppet — crossbar with three strings to hanging dots (marionette abstraction).
+\newcommand{\bcpEmblem@puppet}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \draw[bcpCoverTextMuted, line width=0.9pt]
+    ($(bcpEC)+(-0.45*\bcpemblemr,0.5*\bcpemblemr)$) -- ($(bcpEC)+(0.45*\bcpemblemr,0.5*\bcpemblemr)$);
+  \draw[bcpCoverTextMuted, line width=0.7pt]
+    ($(bcpEC)+(-0.35*\bcpemblemr,0.5*\bcpemblemr)$) -- ($(bcpEC)+(-0.55*\bcpemblemr,-0.55*\bcpemblemr)$);
+  \draw[bcpCoverTextMuted, line width=0.7pt]
+    ($(bcpEC)+(0.1*\bcpemblemr,0.5*\bcpemblemr)$) -- ($(bcpEC)+(0.05*\bcpemblemr,-0.62*\bcpemblemr)$);
+  \draw[bcpCoverTextMuted, line width=0.7pt]
+    ($(bcpEC)+(0.35*\bcpemblemr,0.5*\bcpemblemr)$) -- ($(bcpEC)+(0.5*\bcpemblemr,-0.45*\bcpemblemr)$);
+  \fill[bcpAccent] ($(bcpEC)+(-0.55*\bcpemblemr,-0.55*\bcpemblemr)$) circle (2pt);
+  \fill[bcpAccent] ($(bcpEC)+(0.05*\bcpemblemr,-0.62*\bcpemblemr)$) circle (2pt);
+  \fill[bcpAccent] ($(bcpEC)+(0.5*\bcpemblemr,-0.45*\bcpemblemr)$) circle (2pt);
+}
+
+%% qt — three offset orbit rings around a center dot (abstract atom motif).
+\newcommand{\bcpEmblem@qt}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \pgfmathsetlength{\bcpqtRA}{0.62*\bcpemblemr}%
+  \pgfmathsetlength{\bcpqtRB}{0.28*\bcpemblemr}%
+  \draw[bcpCoverTextMuted, line width=0.9pt, rotate around={20:(bcpEC)}]
+    (bcpEC) circle[x radius=\bcpqtRA, y radius=\bcpqtRB];
+  \draw[bcpCoverTextMuted, line width=0.9pt, rotate around={-35:(bcpEC)}]
+    (bcpEC) circle[x radius=\bcpqtRA, y radius=\bcpqtRB];
+  \draw[bcpAccent, line width=0.9pt, rotate around={80:(bcpEC)}]
+    (bcpEC) circle[x radius=\bcpqtRA, y radius=\bcpqtRB];
+  \fill[bcpCoverTextMuted] (bcpEC) circle (2pt);
+}
+
+%% linux — rounded terminal window with a caret prompt (avoids the trademarked Tux character).
+\newcommand{\bcpEmblem@linux}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \draw[bcpCoverTextMuted, line width=0.9pt, rounded corners=3pt]
+    ($(bcpEC)+(-0.55*\bcpemblemr,-0.38*\bcpemblemr)$) rectangle ($(bcpEC)+(0.55*\bcpemblemr,0.38*\bcpemblemr)$);
+  \draw[bcpAccent, line width=1.1pt]
+    ($(bcpEC)+(-0.32*\bcpemblemr,-0.1*\bcpemblemr)$) -- ($(bcpEC)+(-0.12*\bcpemblemr,0)$) -- ($(bcpEC)+(-0.32*\bcpemblemr,0.1*\bcpemblemr)$);
+  \draw[bcpCoverTextMuted, line width=1.1pt]
+    ($(bcpEC)+(0.02*\bcpemblemr,0.1*\bcpemblemr)$) -- ($(bcpEC)+(0.28*\bcpemblemr,0.1*\bcpemblemr)$);
+}
+
+%% devops — two overlapping circles forming an infinity loop.
+\newcommand{\bcpEmblem@devops}[2]{%
+  \coordinate (bcpEC) at ([xshift=#1, yshift=#2]current page.north west);
+  \draw[bcpCoverTextMuted, line width=0.9pt] ($(bcpEC)+(-0.32*\bcpemblemr,0)$) circle (0.32*\bcpemblemr);
+  \draw[bcpAccent, line width=0.9pt] ($(bcpEC)+(0.32*\bcpemblemr,0)$) circle (0.32*\bcpemblemr);
+}
+
+\endinput
