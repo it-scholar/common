@@ -19,10 +19,18 @@
 # Tasks exposed (flattened, so callable as `task digital` etc. from the book dir):
 #   task / task digital   — build digital PDF (color)
 #   task print            — build print PDF (grayscale-safe)
+#   task cover            — build all cover artifacts (digital + print + thumbnail)
+#   task cover-digital    — build front-cover-only PDF (no bleed)
+#   task cover-print      — build back+spine+front wraparound PDF (with bleed)
+#   task cover-thumbnail  — rasterize the digital cover to a PNG (300dpi)
 #   task clean            — remove auxiliary files
 #   task distclean        — remove all build artifacts including PDFs
 #   task watch            — live-rebuild on file changes (requires latexmk -pvc)
 #   task lint             — run lacheck (if available)
+#
+# Cover tasks expect a book's cover/cover.tex (\documentclass{bcpedu-cover}),
+# see common/latex/bcpedu-cover.cls. Override COVER_DIR/COVER_MAIN vars if a
+# book uses a different location.
 # =============================================================================
 
 version: "3"
@@ -41,6 +49,11 @@ vars:
     {{if .EXTRA_TEXINPUTS}}{{.EXTRA_TEXINPUTS}}:{{end}}{{.COMMON_DIR}}:$PWD:
   DIGITAL_PDF: "{{.OUT_DIR}}/{{.MAIN}}-digital.pdf"
   PRINT_PDF: "{{.OUT_DIR}}/{{.MAIN}}-print.pdf"
+  COVER_DIR: '{{.COVER_DIR | default "cover"}}'
+  COVER_MAIN: '{{.COVER_MAIN | default "cover"}}'
+  COVER_DIGITAL_PDF: "{{.OUT_DIR}}/cover-digital.pdf"
+  COVER_PRINT_PDF: "{{.OUT_DIR}}/cover-print.pdf"
+  COVER_THUMBNAIL_PNG: "{{.OUT_DIR}}/cover-thumbnail.png"
 
 tasks:
   default:
@@ -77,6 +90,67 @@ tasks:
         {{.MAIN}}.tex
       - mv -f "{{.MAIN}}-print.pdf" "{{.PRINT_PDF}}"
       - 'echo "==> Done: {{.PRINT_PDF}}"'
+
+  cover:
+    desc: Build all cover artifacts (digital front, print wraparound, thumbnail)
+    cmds:
+      - task: cover-digital
+      - task: cover-print
+      - task: cover-thumbnail
+
+  cover-digital:
+    desc: Build the front-cover-only PDF (trim size, no bleed) - digital/thumbnail use
+    deps: [_ensure_outdir]
+    cmds:
+      - 'echo "==> Building digital cover PDF: {{.COVER_DIGITAL_PDF}}"'
+      - >-
+        TEXINPUTS="{{.TEXINPUTS_FULL}}"
+        latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode
+        -file-line-error -cd- -r {{.COMMON_DIR}}/latexmkrc
+        -jobname={{.COVER_MAIN}}-digital
+        -pretex="\PassOptionsToClass{front}{bcpedu-cover}" -usepretex
+        {{.COVER_DIR}}/{{.COVER_MAIN}}.tex
+      - mv -f "{{.COVER_MAIN}}-digital.pdf" "{{.COVER_DIGITAL_PDF}}"
+      - 'echo "==> Done: {{.COVER_DIGITAL_PDF}}"'
+
+  cover-print:
+    desc: Build the full wraparound (back+spine+front, with bleed) print-ready cover PDF
+    deps: [_ensure_outdir, print]
+    cmds:
+      - |
+        echo "==> Computing spine width from print PDF page count"
+        PAGES=$(pdfinfo "{{.PRINT_PDF}}" | awk '/^Pages:/ {print $2}')
+        if [ -z "$PAGES" ]; then
+          echo "ERROR: could not determine page count from {{.PRINT_PDF}}" >&2
+          exit 1
+        fi
+        # Approximate KDP-style spine formula for white paper (~0.0025in/page), floor 0.06in.
+        SPINE_IN=$(awk -v p="$PAGES" 'BEGIN { s = p * 0.0025; if (s < 0.06) s = 0.06; printf "%.3f", s }')
+        echo "==> Pages: $PAGES, computed spine width: ${SPINE_IN}in"
+        echo "==> Building print cover PDF: {{.COVER_PRINT_PDF}}"
+        TEXINPUTS="{{.TEXINPUTS_FULL}}" \
+        latexmk -{{.TEXENGINE}} -shell-escape -interaction=nonstopmode \
+          -file-line-error -cd- -r {{.COMMON_DIR}}/latexmkrc \
+          -jobname={{.COVER_MAIN}}-print \
+          -pretex="\newcommand{\bcpinjectedspinewidth}{${SPINE_IN}in}\PassOptionsToClass{wrap}{bcpedu-cover}" -usepretex \
+          {{.COVER_DIR}}/{{.COVER_MAIN}}.tex
+        mv -f "{{.COVER_MAIN}}-print.pdf" "{{.COVER_PRINT_PDF}}"
+        echo "==> Done: {{.COVER_PRINT_PDF}}"
+
+  cover-thumbnail:
+    desc: Rasterize the digital front cover to a PNG thumbnail (300dpi)
+    deps: [cover-digital]
+    cmds:
+      - |
+        if command -v pdftoppm >/dev/null 2>&1; then
+          pdftoppm -r 300 -png -singlefile "{{.COVER_DIGITAL_PDF}}" "{{.OUT_DIR}}/cover-thumbnail"
+        elif command -v magick >/dev/null 2>&1; then
+          magick -density 300 "{{.COVER_DIGITAL_PDF}}" "{{.COVER_THUMBNAIL_PNG}}"
+        else
+          echo "ERROR: need pdftoppm (poppler-utils) or ImageMagick 'magick' to build the thumbnail" >&2
+          exit 1
+        fi
+        echo "==> Done: {{.COVER_THUMBNAIL_PNG}}"
 
   watch:
     desc: Live-rebuild the digital PDF on file changes (Ctrl-C to stop)
