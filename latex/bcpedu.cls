@@ -144,6 +144,7 @@
 \RequirePackage{multirow}          % multirow table cells
 \RequirePackage{array}             % extended column specs
 \RequirePackage{tabularx}          % auto-width table columns
+\RequirePackage{rotating}          % sidewaystable/figure: full-page landscape floats
 \RequirePackage{enumitem}          % list spacing control
 \RequirePackage{xspace}            % smart trailing space in macros
 \RequirePackage{calc}              % length arithmetic
