@@ -166,10 +166,21 @@
 %%   \renewcommand{\bcpcopyrighttext}{...}
 %%
 \newcommand{\bcpcopyrighttext}{%
-  Copyright \textcopyright\ \the\year\ \@bookauthor. All rights reserved.\\[6pt]
-  No part of this book may be reproduced or transmitted in any form
-  without written permission from the publisher.\\[6pt]
-  \textbf{Version \@bookversion} --- \@bookedition
+  Copyright \textcopyright\ \the\year\ \@bookauthor. All rights reserved.\\[8pt]
+  No part of this publication may be reproduced, distributed, or transmitted
+  in any form or by any means, including photocopying, recording, or other
+  electronic or mechanical methods, without the prior written permission of
+  the publisher, except in the case of brief quotations embodied in critical
+  reviews and certain other non-commercial uses permitted by copyright law.\\[8pt]
+  All product names, trademarks, and registered trademarks mentioned in this
+  book are the property of their respective owners.\\[8pt]
+  The information in this book is provided on an ``as is'' basis. Although
+  every precaution has been taken in the preparation of this work, the author
+  and publisher assume no responsibility for errors or omissions, or for
+  damages resulting from the use of the information contained herein.\\[8pt]
+  \textbf{\@booktitle}\\[2pt]
+  \@bookedition\ --- Version \@bookversion\\[2pt]
+  Published by \@bookauthor.
 }
 
 \newcommand{\bcpcopyrightpage}{%
@@ -178,8 +189,6 @@
   \begin{flushleft}
     \small\color{bcpTextSecond}
     \bcpcopyrighttext
-    \par\vspace{12pt}
-    \textit{Typeset with \hologo{XeLaTeX} and the \texttt{bcpedu} document class.}
   \end{flushleft}
   \cleardoublepage
 }
@@ -187,7 +196,7 @@
 %% ─── Table of Contents ────────────────────────────────────────────────────────
 %% The ToC entry styles are set in bcpedu-headings.sty via titletoc.
 %% Here we override the ToC title style and depth.
-\setcounter{tocdepth}{2}          % show chapters + sections + subsections
+\setcounter{tocdepth}{1}          % show chapters + sections only (2 levels)
 \setcounter{secnumdepth}{3}       % number chapters + sections + subsections + subsubsections
 
 %% Style the ToC heading consistently with section headings
