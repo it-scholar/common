@@ -212,9 +212,12 @@
   \par\smallskip\noindent
 }
 
-\newenvironment{labexercise}[1][]{%
+%% #1 = optional metadata (env=..., state=...; reserved for future use, not
+%%      rendered), #2 = mandatory exercise title.
+\newenvironment{labexercise}[2][]{%
   \refstepcounter{bcpExercise}%
-  \def\bcpLabTitle{#1}%
+  \def\bcpLabMeta{#1}%
+  \def\bcpLabTitle{#2}%
   \bcpLabBand{Exercise \thebcpExercise%
     \ifx\bcpLabTitle\empty\else\enspace---\enspace\bcpLabTitle\fi}%
   \small
