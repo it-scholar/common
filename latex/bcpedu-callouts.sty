@@ -187,41 +187,44 @@
 }
 
 %% ─── Convenience: chapter exercise box (numbered) ───────────────────────────
-%% A counter-based exercise box for end-of-chapter exercises.
+%% A counter-based exercise block for end-of-chapter exercises.
 %% Reset per chapter automatically.
+%%
+%% The lab content is normal chapter content (no enclosing container box):
+%% only a full-width marker band signals the beginning and the end of the
+%% exercise, so terminal/code blocks and prose inside typeset at full width
+%% exactly like the surrounding chapter text.
 \newcounter{bcpExercise}[chapter]
 \renewcommand{\thebcpExercise}{\thechapter.\arabic{bcpExercise}}
+
+%% Full-width marker band: #1 = label text (already fully expanded)
+\newcommand{\bcpLabBand}[1]{%
+  \par\medskip\noindent
+  \begingroup
+    \sffamily\bfseries\small
+    \setlength{\fboxsep}{5pt}%
+    \colorbox{bcpExerciseTeal}{%
+      \textcolor{bcpExerciseTitleFg}{%
+        \faFlask\enspace #1%
+      }%
+    }%
+  \endgroup
+  \par\smallskip\noindent
+}
 
 \newenvironment{labexercise}[1][]{%
   \refstepcounter{bcpExercise}%
   \def\bcpLabTitle{#1}%
-  \begin{tcolorbox}[
-    enhanced,
-    breakable,
-    arc           = 3pt,
-    boxrule       = 0.6pt,
-    colback       = bcpExerciseBg,
-    colframe      = bcpExerciseBorder,
-    colbacktitle  = bcpExerciseTeal,
-    coltitle      = bcpExerciseTitleFg,
-    fonttitle     = {\sffamily\bfseries\small},
-    title         = {%
-      \faFlask\enspace
-      Exercise \thebcpExercise%
-      \ifx\bcpLabTitle\empty\else\enspace---\enspace\bcpLabTitle\fi
-    },
-    titlerule     = 0pt,
-    toptitle      = 4pt,
-    bottomtitle   = 4pt,
-    lefttitle     = 10pt,
-    righttitle    = 10pt,
-    left=10pt, right=10pt, top=8pt, bottom=8pt,
-    before skip=4pt plus 2pt,
-    after skip=10pt plus 3pt,
-    fontupper={\small},
-  ]%
+  \bcpLabBand{Exercise \thebcpExercise%
+    \ifx\bcpLabTitle\empty\else\enspace---\enspace\bcpLabTitle\fi}%
+  \small
 }{%
-  \end{tcolorbox}%
+  \par\smallskip\noindent
+  \begingroup
+    \sffamily\bfseries\small\color{bcpExerciseTeal}%
+    \faFlagCheckered\enspace End of Exercise \thebcpExercise
+  \endgroup
+  \par\medskip
 }
 
 \endinput
