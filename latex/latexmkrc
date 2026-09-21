@@ -8,6 +8,15 @@
 # the .bcf file is not found at startup (e.g. fresh build with out/ empty).
 $bibtex_use = 2;
 
+# macOS TeX Live ships biber as a universal (x86_64+arm64) binary that
+# self-extracts its native slice at runtime via `lipo ... -extract_family`.
+# Recent Xcode Command Line Tools removed -extract_family from lipo, so the
+# stock biber fails immediately with "extracting arm64 binary with lipo
+# failed". Prefer a native (non-universal) Homebrew build when present.
+if (-x '/opt/homebrew/bin/biber') {
+    $biber = '/opt/homebrew/bin/biber';
+}
+
 # ── Glossaries (glossaries-extra) ─────────────────────────────────────────────
 # .glo → .gls  (main glossary)
 # .acn → .acr  (acronym list)
