@@ -264,7 +264,7 @@ Inline: `\code{git commit}`, `\filename{/etc/hosts}`, `\envvar{HOME}`, `\cmdname
 \end{objectivesbox}
 
 % Numbered lab exercise (auto-increments per chapter)
-\begin{labexercise}[Deploy Your First Pod]
+\begin{labexercise}{Deploy Your First Pod}
   In this exercise you will...
 \end{labexercise}
 ```
