@@ -85,6 +85,47 @@
 \NewDocumentCommand{\bookdescription}{m}{\renewcommand{\@bookdescription}{#1}}
 \NewDocumentCommand{\bookghostword} {m}{\renewcommand{\@bookghostword}{#1}}
 
+%% ─── KDP / publishing metadata ───────────────────────────────────────────────
+%% Optional; conventionally set in config/kdp.tex (input from config/metadata.tex).
+%% Consumed by the copyright page (ISBN) and by common/latex/kdp-metadata.py,
+%% which generates the Amazon KDP title-setup sheet (`task kdp`).
+\newcommand{\@bookisbn}{}              % paperback ISBN-13; empty = free KDP ISBN
+\newcommand{\@bookeisbn}{}             % Kindle eBook ISBN (optional; not required by KDP)
+\newcommand{\@booklanguage}{English}
+\newcommand{\@bookpubdate}{}           % YYYY-MM-DD; empty = publish as soon as approved
+\newcommand{\@bookseriesnumber}{}      % volume number within \bookseries
+\newcommand{\@bookimprint}{BCP Education}  % imprint (required when using your own ISBN)
+\newcommand{\@bookkeywords}{}          % up to 7, comma-separated
+\newcommand{\@bookcategories}{}        % up to 3, comma-separated browse categories
+\newcommand{\@booklistprice}{}         % paperback list price, e.g. 34.99
+\newcommand{\@bookcurrency}{USD}
+\newcommand{\@bookpapertype}{white}    % white | cream
+\newcommand{\@bookink}{black}          % black | premium-color
+\newcommand{\@bookcoverfinish}{matte}  % matte | glossy
+\newcommand{\@bookbleed}{no}           % interior bleed: no | yes
+\newcommand{\@bookaicontent}{}         % KDP AI disclosure: none | some | extensive
+\newcommand{\@bookadultcontent}{no}    % 18+ content: no | yes
+\newcommand{\@booklongdescription}{}   % KDP marketing description (<= 4000 chars);
+                                       % empty = generator falls back to cover blurb
+
+\NewDocumentCommand{\bookisbn}          {m}{\renewcommand{\@bookisbn}{#1}}
+\NewDocumentCommand{\bookeisbn}         {m}{\renewcommand{\@bookeisbn}{#1}}
+\NewDocumentCommand{\booklanguage}      {m}{\renewcommand{\@booklanguage}{#1}}
+\NewDocumentCommand{\bookpubdate}       {m}{\renewcommand{\@bookpubdate}{#1}}
+\NewDocumentCommand{\bookseriesnumber}  {m}{\renewcommand{\@bookseriesnumber}{#1}}
+\NewDocumentCommand{\bookimprint}       {m}{\renewcommand{\@bookimprint}{#1}}
+\NewDocumentCommand{\bookkeywords}      {m}{\renewcommand{\@bookkeywords}{#1}}
+\NewDocumentCommand{\bookcategories}    {m}{\renewcommand{\@bookcategories}{#1}}
+\NewDocumentCommand{\booklistprice}     {m}{\renewcommand{\@booklistprice}{#1}}
+\NewDocumentCommand{\bookcurrency}      {m}{\renewcommand{\@bookcurrency}{#1}}
+\NewDocumentCommand{\bookpapertype}     {m}{\renewcommand{\@bookpapertype}{#1}}
+\NewDocumentCommand{\bookink}           {m}{\renewcommand{\@bookink}{#1}}
+\NewDocumentCommand{\bookcoverfinish}   {m}{\renewcommand{\@bookcoverfinish}{#1}}
+\NewDocumentCommand{\bookbleed}         {m}{\renewcommand{\@bookbleed}{#1}}
+\NewDocumentCommand{\bookaicontent}     {m}{\renewcommand{\@bookaicontent}{#1}}
+\NewDocumentCommand{\bookadultcontent}  {m}{\renewcommand{\@bookadultcontent}{#1}}
+\NewDocumentCommand{\booklongdescription}{m}{\renewcommand{\@booklongdescription}{#1}}
+
 %% ─── Load sub-packages in dependency order ────────────────────────────────
 %%
 %% 1. Colors first (everything else depends on color names)

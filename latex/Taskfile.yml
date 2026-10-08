@@ -23,6 +23,7 @@
 #   task cover-digital    — build front-cover-only PDF (no bleed)
 #   task cover-print      — build back+spine+front wraparound PDF (with bleed)
 #   task cover-thumbnail  — rasterize the digital cover to a PNG (300dpi)
+#   task kdp              — generate KDP title-setup metadata (out/kdp-metadata.md/.json)
 #   task clean            — remove auxiliary files
 #   task distclean        — remove all build artifacts including PDFs
 #   task watch            — live-rebuild on file changes (requires latexmk -pvc)
@@ -124,8 +125,13 @@ tasks:
           echo "ERROR: could not determine page count from {{.PRINT_PDF}}" >&2
           exit 1
         fi
-        # Approximate KDP-style spine formula for white paper (~0.0025in/page), floor 0.06in.
-        SPINE_IN=$(awk -v p="$PAGES" 'BEGIN { s = p * 0.0025; if (s < 0.06) s = 0.06; printf "%.3f", s }')
+        # Exact KDP spine formula (per paper type from config/kdp.tex); falls back
+        # to the approximate white-paper formula (~0.0025in/page, floor 0.06in).
+        SPINE_IN=$(python3 "{{.COMMON_DIR}}/kdp-metadata.py" --spine-only \
+          --out-dir "{{.OUT_DIR}}" --main "{{.MAIN}}" 2>/dev/null || true)
+        if [ -z "$SPINE_IN" ]; then
+          SPINE_IN=$(awk -v p="$PAGES" 'BEGIN { s = p * 0.0025; if (s < 0.06) s = 0.06; printf "%.3f", s }')
+        fi
         echo "==> Pages: $PAGES, computed spine width: ${SPINE_IN}in"
         echo "==> Building print cover PDF: {{.COVER_PRINT_PDF}}"
         TEXINPUTS="{{.TEXINPUTS_FULL}}" \
@@ -151,6 +157,15 @@ tasks:
           exit 1
         fi
         echo "==> Done: {{.COVER_THUMBNAIL_PNG}}"
+
+  kdp:
+    desc: Generate KDP title-setup metadata (out/kdp-metadata.md + out/kdp-metadata.json)
+    deps: [_ensure_outdir]
+    cmds:
+      - 'echo "==> Generating KDP metadata"'
+      - >-
+        python3 "{{.COMMON_DIR}}/kdp-metadata.py"
+        --book-dir "$PWD" --out-dir "{{.OUT_DIR}}" --main "{{.MAIN}}"
 
   watch:
     desc: Live-rebuild the digital PDF on file changes (Ctrl-C to stop)

@@ -126,7 +126,8 @@ common/
     bcpedu-front.sty      Title page, ToC, LoF/LoT/LoL, preface
     bcpedu-back.sty       Glossary, index, bibliography, appendix
     bcpedu-index.ist      MakeIndex style for back-of-book index
-    Makefile.common       Shared build rules (include from book Makefiles)
+    kdp-metadata.py       KDP title-setup metadata generator (`task kdp`)
+    Taskfile.yml          Shared build rules (included from each book's Taskfile)
     README.md             This file
 ```
 
@@ -331,6 +332,71 @@ The \term{container} isolates processes from the host.
 | `make watch` | `main-digital.pdf` | Auto-rebuilds on save |
 | `make clean` | — | Removes aux files |
 | `make distclean` | — | Removes aux files + PDFs |
+
+---
+
+## KDP Publishing Metadata
+
+Each book can generate the information needed for the Amazon KDP title-setup
+wizard (paperback details, content, and pricing) from its existing LaTeX
+configuration:
+
+```bash
+cd courses/<topic>/books/<book>
+task print   # needed once, for page count / spine width / printing cost
+task kdp     # writes out/kdp-metadata.md (copy-paste sheet) + out/kdp-metadata.json
+```
+
+The generator (`kdp-metadata.py`) reads `config/metadata.tex`, the optional
+`config/kdp.tex`, and the blurb/takeaways from `cover/cover.tex`. It validates
+KDP rules (title ≤ 200 chars, description ≤ 4000 chars, ≤ 7 keywords, ≤ 3
+categories, ISBN-13 check digit) and prints warnings for anything missing.
+
+### Per-book KDP settings — `config/kdp.tex`
+
+Create `config/kdp.tex` next to `config/metadata.tex` and `\input{config/kdp}`
+at the end of `metadata.tex`. All commands are optional (sensible defaults in
+`bcpedu.cls`); a book compiles fine without this file, but `task kdp` will warn
+about the missing fields.
+
+```latex
+%% config/kdp.tex — KDP publishing metadata
+\bookisbn{}                       % paperback ISBN-13; empty = use free KDP ISBN
+\bookeisbn{}                      % Kindle ISBN (optional; KDP assigns an ASIN anyway)
+\booklanguage{English}
+\bookpubdate{}                    % YYYY-MM-DD; empty = publish when approved
+\bookseriesnumber{1}              % volume within \bookseries
+\bookimprint{BCP Education}       % required when using your own ISBN
+\bookkeywords{kubernetes, container orchestration, devops, cloud native, kubectl, docker containers, microservices}
+\bookcategories{Computers / Operating Systems / Linux & UNIX, Computers / Software Development & Engineering / Tools}
+\booklistprice{34.99}
+\bookcurrency{USD}
+\bookpapertype{white}             % white | cream
+\bookink{black}                   % black | premium-color
+\bookcoverfinish{matte}           % matte | glossy
+\bookbleed{no}                    % interior bleed
+\bookaicontent{none}              % AI disclosure: none | some | extensive
+\bookadultcontent{no}
+\booklongdescription{}            % <= 4000 chars; empty = reuse the cover blurb
+```
+
+When `\bookisbn` is set it is also printed on the copyright page
+(`\bcpcopyrightpage`) automatically.
+
+### Notes
+
+- **Trim/margins** are already KDP-compatible (7"×10", large trim class).
+- **Spine width:** `task cover-print` uses the exact KDP formula per paper type
+  (white 0.002252"/page, cream 0.0025", color 0.002347") via `kdp-metadata.py
+  --spine-only`, falling back to the old 0.0025" approximation if the script
+  or page count is unavailable.
+- **Printing cost / minimum list price** in the generated sheet use KDP's
+  published large-trim rates (2025) for Amazon.com/.de/.uk — always confirm
+  with KDP's Printing Cost & Royalty Calculator before publishing.
+- **Barcode:** leave the marked 2"×1.2" area on the back cover blank; KDP
+  prints the ISBN barcode there.
+- The `kdp` class option (`\documentclass[print,kdp]{bcpedu}`) is reserved for
+  future PDF/X-1a output and currently has no effect.
 
 ---
 
