@@ -29,11 +29,24 @@ const cmd = `"${mmdc}" -i "${absInput}" -o "${absOutput}"${pdfFit} --puppeteerCo
 
 console.log("Running command:", cmd);
 
-exec(cmd, (err, stdout, stderr) => {
-  if (err) {
-    console.error("❌ Mermaid CLI error:", stderr || err.message);
-    process.exit(1);
-  } else {
-    console.log(`✅ Built ${absOutput}`);
-  }
-});
+// CI runners are heavily loaded (task all runs slides, books and diagram
+// builds concurrently), which can starve the Chrome renderer long enough to
+// trip Puppeteer timeouts. Retry once before giving up.
+let attempt = 0;
+const run = () => {
+  attempt += 1;
+  exec(cmd, (err, stdout, stderr) => {
+    if (err) {
+      if (attempt < 3) {
+        console.warn(`⚠️  Attempt ${attempt} failed, retrying: ${stderr || err.message}`);
+        setTimeout(run, 5000);
+        return;
+      }
+      console.error("❌ Mermaid CLI error:", stderr || err.message);
+      process.exit(1);
+    } else {
+      console.log(`✅ Built ${absOutput}`);
+    }
+  });
+};
+run();

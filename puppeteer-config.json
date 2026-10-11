@@ -1,3 +1,4 @@
 {
-  "args": ["--no-sandbox", "--disable-dev-shm-usage"]
+  "args": ["--no-sandbox", "--disable-dev-shm-usage"],
+  "protocolTimeout": 600000
 }
