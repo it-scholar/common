@@ -42,15 +42,29 @@
   \cleardoublepage
 }
 
+%% ─── KDP safe-zone insets for full-page decorations ──────────────────────────
+%% KDP paperback interiors are printed WITHOUT bleed: every mark on the page
+%% must stay inside the reviewer's "safe zone", measured from the trim edges:
+%%   - top / bottom / outer edge: 0.25in (0.64cm)
+%%   - gutter (binding side):     0.375in–0.875in depending on page count
+%%     (max tier 701–828 pages → 0.875in = 2.23cm)
+%% The title page is always a recto, so its left edge is the gutter.
+%% 2.4cm clears the largest KDP gutter tier with margin to spare, and 0.8cm
+%% clears the 0.25in requirement on the outer/bottom edges.
+\newlength{\bcptitlesafeleft}\setlength{\bcptitlesafeleft}{2.4cm}
+\newlength{\bcptitlesafeedge}\setlength{\bcptitlesafeedge}{0.8cm}
+
 %% ─── Full title page ─────────────────────────────────────────────────────────
 %% Replaces the standard \maketitle with a designed title page.
 %% Layout:
-%%   - Accent color band across the top (20% of page height)
-%%   - Series name + book number in the band
-%%   - Book title in large bold sans below the band
+%%   - Series name, tiny uppercase, top-left
+%%   - Book title in large bold sans, with gold square accent
 %%   - Subtitle in regular sans
 %%   - Horizontal accent rule
+%%   - Ghost word, bottom-right, extremely pale
 %%   - Author + Edition at the bottom
+%% All elements are inset from the trim edges per the KDP safe zone above;
+%% no ink may touch the page edge (no-bleed interior).
 %%
 \renewcommand{\maketitle}{%
   \begin{titlepage}%
@@ -59,16 +73,10 @@
     \null%  % minimal flow content; all layout is in TikZ overlay
     \begin{tikzpicture}[remember picture, overlay]
 
-      %% ── Left gold accent bar — full-height vertical stripe ──────────────────
-      \fill[bcpAccent]
-        (current page.north west)
-        rectangle
-        ([xshift=5pt]current page.south west);
-
       %% ── Series label — top-left, tiny uppercase, very gray ──────────────────
       \node[
         anchor    = north west,
-        xshift    = 1.4cm, yshift = -2.0cm,
+        xshift    = \bcptitlesafeleft, yshift = -2.0cm,
         inner sep = 0pt,
       ] at (current page.north west)
         {{\fontsize{6.5pt}{8pt}\selectfont\sffamily\color{black!35}%
@@ -77,7 +85,7 @@
       %% ── Gold square accent mark ─────────────────────────────────────────────
       \node[
         anchor    = north west,
-        xshift    = 1.4cm, yshift = -4.8cm,
+        xshift    = \bcptitlesafeleft, yshift = -4.8cm,
         inner sep = 0pt,
       ] at (current page.north west)
         {\textcolor{bcpAccent}{\rule{0.65em}{0.65em}}};
@@ -90,7 +98,7 @@
       \exhyphenpenalty=10000\relax
       \node[
         anchor     = north west,
-        xshift     = 1.4cm, yshift = -5.8cm,
+        xshift     = \bcptitlesafeleft, yshift = -5.8cm,
         text width = 14.0cm,
         align      = left,
         inner sep  = 0pt,
@@ -104,7 +112,7 @@
       \ifdefempty{\@booksubtitle}{}{%
         \node[
           anchor     = north west,
-          xshift     = 1.4cm, yshift = -12.0cm,
+          xshift     = \bcptitlesafeleft, yshift = -12.0cm,
           text width = 14.0cm,
           align      = left,
           inner sep  = 0pt,
@@ -115,16 +123,17 @@
 
       %% ── Short gold accent line — separator ──────────────────────────────────
       \fill[bcpAccent]
-        ([xshift=1.4cm, yshift=-14.2cm]current page.north west)
+        ([xshift=\bcptitlesafeleft, yshift=-14.2cm]current page.north west)
         rectangle
-        ([xshift=9.9cm, yshift=-14.35cm]current page.north west);
+        ([xshift=\bcptitlesafeleft+8.5cm, yshift=-14.35cm]current page.north west);
 
       %% ── Ghost word — bottom-right, extremely pale ───────────────────────────
       %% Set via \bookghostword{WORD} in config/metadata.tex.
+      %% Inset by \bcptitlesafeedge so no ink enters the outer/bottom margin.
       \ifdefempty{\@bookghostword}{}{%
         \node[
           anchor    = south east,
-          xshift    = -0.2cm, yshift = 0.6cm,
+          xshift    = -\bcptitlesafeedge, yshift = \bcptitlesafeedge,
           inner sep = 0pt,
         ] at (current page.south east)
           {{\fontsize{120pt}{120pt}\selectfont\sffamily\bfseries\color{black!5}%
@@ -134,7 +143,7 @@
       %% ── Author name — bottom-left, gold square, bold ────────────────────────
       \node[
         anchor    = south west,
-        xshift    = 1.4cm, yshift = 3.6cm,
+        xshift    = \bcptitlesafeleft, yshift = 3.6cm,
         inner sep = 0pt,
       ] at (current page.south west)
         {{\normalsize\sffamily\bfseries\color{black}%
@@ -143,7 +152,7 @@
       %% ── Edition / version — small gray ──────────────────────────────────────
       \node[
         anchor    = south west,
-        xshift    = 1.4cm, yshift = 2.4cm,
+        xshift    = \bcptitlesafeleft, yshift = 2.4cm,
         inner sep = 0pt,
       ] at (current page.south west)
         {{\fontsize{9pt}{11pt}\selectfont\sffamily\color{black!45}%
@@ -151,7 +160,7 @@
 
       %% ── Bottom gold line ─────────────────────────────────────────────────────
       \fill[bcpAccent]
-        ([yshift=0.75cm]current page.south west)
+        ([xshift=\bcptitlesafeleft, yshift=0.75cm]current page.south west)
         rectangle
         ([xshift=0.42\paperwidth, yshift=0.803cm]current page.south west);
 
