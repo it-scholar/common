@@ -171,7 +171,8 @@
   %% linenos=true so fancyvrb renders one entry per line — we replace the
   %% number with a non-copyable $ prompt via \theFancyVerbLine below.
   minted options  = {style=monokai, linenos=true, fontsize=\small, tabsize=4,
-                     breaklines=true, xleftmargin=2em, numbersep=8pt},
+                     breaklines=true, breakanywhere=true, breakautoindent=false,
+                     xleftmargin=2em, numbersep=8pt},
   before upper    = {%
     \renewcommand{\theFancyVerbLine}{%
       \bcpCopyExclude{{\small\bfseries\color{bcpTermInPrompt}\$}}%
@@ -202,7 +203,10 @@
   minted language = text,
   %% style=bw: plain-text lexer emits no explicit \textcolor commands,
   %% so coltext below controls ALL output text color reliably.
-  minted options  = {style=bw, linenos=false, fontsize=\small, tabsize=4, breaklines=true},
+  %% breakanywhere: machine output (JSON logs, URLs, kubectl wide output)
+  %% has no spaces to break at — without it such lines overflow the box.
+  minted options  = {style=bw, linenos=false, fontsize=\small, tabsize=4,
+                     breaklines=true, breakanywhere=true, breakautoindent=false},
   colback         = bcpTermOutBg,
   colframe        = bcpTermOutBg,
   coltext         = bcpTermOutFg,
