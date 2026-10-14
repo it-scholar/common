@@ -198,14 +198,18 @@
 \renewcommand{\thebcpExercise}{\thechapter.\arabic{bcpExercise}}
 
 %% Full-width marker band: #1 = label text (already fully expanded)
+%% The \parbox lets long titles wrap to a second line; a plain \colorbox
+%% cannot wrap and would overflow into the margin.
 \newcommand{\bcpLabBand}[1]{%
   \par\medskip\noindent
   \begingroup
     \sffamily\bfseries\small
     \setlength{\fboxsep}{5pt}%
     \colorbox{bcpExerciseTeal}{%
-      \textcolor{bcpExerciseTitleFg}{%
-        \faFlask\enspace #1%
+      \parbox[c]{\dimexpr\linewidth-2\fboxsep\relax}{%
+        \textcolor{bcpExerciseTitleFg}{%
+          \faFlask\enspace #1%
+        }%
       }%
     }%
   \endgroup

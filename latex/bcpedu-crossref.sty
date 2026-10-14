@@ -57,6 +57,10 @@
   ]{hyperref}
 \fi
 
+%% xurl: allow \url to break at any character (long URLs otherwise overflow
+%% into the print margins). Must be loaded after hyperref.
+\RequirePackage{xurl}
+
 %% ─── QR code package ─────────────────────────────────────────────────────────
 %% Only rendered in print mode. In digital, just show the label.
 \if@bcpprint

@@ -222,10 +222,42 @@
 %% \code{} is defined in bcpedu-fonts.sty for styled inline code.
 %% The following add semantic meaning on top.
 
-%% File path or filename
-\newcommand{\filename}[1]{%
-  \texttt{\textcolor{bcpAccentDark}{#1}}%
-}
+%% ─── Breakable inline code ───────────────────────────────────────────────────
+%% \brktt{...} — like \texttt, but with hyphenless breakpoints inserted after
+%% . / - : so long identifiers (DNS names, annotation keys, CLI flag strings)
+%% can wrap instead of overflowing into the margin. No hyphen character is
+%% added at the break, so readers cannot mistake the wrap for part of the
+%% identifier. Use for any inline code string longer than ~30 characters.
+\ExplSyntaxOn
+\tl_new:N \l__bcp_brktt_tl
+%% Colon as a catcode-12 string: under \ExplSyntaxOn ':' is a letter, so a
+%% literal {:} search pattern would never match the catcode-12 colons that
+%% appear in document text (system:serviceaccount:...).
+\str_const:Nn \c__bcp_colon_str {:}
+\cs_generate_variant:Nn \tl_replace_all:Nnn { NVn }
+\cs_new_protected:Nn \__bcp_brktt_do:n
+  {
+    \tl_set:Nn \l__bcp_brktt_tl {#1}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {.} {.\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {/} {/\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {-} {-\allowbreak}
+    \tl_replace_all:NVn \l__bcp_brktt_tl \c__bcp_colon_str {:\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {=} {=\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {,} {,\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {(} {(\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {)} {)\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {\_} {\_\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {\{} {\{\allowbreak}
+    \tl_replace_all:Nnn \l__bcp_brktt_tl {\}} {\}\allowbreak}
+    \tl_use:N \l__bcp_brktt_tl
+  }
+\NewDocumentCommand{\brktt}{m}
+  {{\ttfamily \__bcp_brktt_do:n {#1}}}
+
+%% File path or filename (breakable at / . - like \brktt)
+\NewDocumentCommand{\filename}{m}
+  {{\ttfamily \color{bcpAccentDark} \__bcp_brktt_do:n {#1}}}
+\ExplSyntaxOff
 
 %% Environment variable name
 \newcommand{\envvar}[1]{%
