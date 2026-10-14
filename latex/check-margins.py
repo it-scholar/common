@@ -43,6 +43,11 @@ GUTTER_TIERS = [
     (828, 0.875),
 ]
 
+# Maximum page count for a KDP hardcover (case laminate) interior.
+# Content is identical across hardcover/paperback/ebook, so the hardcover
+# limit constrains every format.
+KDP_HARDCOVER_MAX_PAGES = 550
+
 # Pixels at least this dark count as ink (255 = white). Catches pale design
 # elements such as black!5 ghost numbers (~242), which count as ink for KDP.
 INK_THRESHOLD = 250
@@ -135,6 +140,13 @@ def check_pdf(pdf, dpi, tolerance_in, first, last, verbose):
             f"tolerance: {tolerance_in}in"
         )
 
+    page_limit_failure = None
+    if pages > KDP_HARDCOVER_MAX_PAGES:
+        page_limit_failure = (
+            f"page count {pages} exceeds the KDP hardcover limit of "
+            f"{KDP_HARDCOVER_MAX_PAGES} pages"
+        )
+
     first = max(1, first or 1)
     last = min(pages, last or pages)
 
@@ -203,12 +215,16 @@ def check_pdf(pdf, dpi, tolerance_in, first, last, verbose):
                     f"(overflow {required - actual:.3f}in)"
                 )
         print(
-            f"\nFAIL: {len(violations)} margin violation(s) on "
+            f"FAIL: {len(violations)} margin violation(s) on "
             f"{len(by_page)} page(s)"
         )
+    if page_limit_failure:
+        print(f"FAIL: {page_limit_failure}")
+    if violations or page_limit_failure:
         return 1
 
-    print(f"OK: pages {first}-{last} comply with KDP safe margins")
+    print(f"OK: pages {first}-{last} comply with KDP safe margins "
+          f"and the {KDP_HARDCOVER_MAX_PAGES}-page hardcover limit")
     return 0
 
 

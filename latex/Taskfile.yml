@@ -193,7 +193,8 @@ tasks:
         fi
 
   check-margins:
-    desc: Verify no content lies outside the KDP safe margins in the print PDF
+    desc: Verify no content lies outside the KDP safe margins in the print PDF,
+      and that the page count stays within the 550-page KDP hardcover limit
     deps: [_ensure_outdir]
     cmds:
       - 'echo "==> Checking KDP safe margins: {{.PRINT_PDF}}"'

@@ -22,6 +22,25 @@
 %%   bottom:                3.0cm (includes footer, feels grounded)
 %%   KDP minimum inner for perfect binding 300+ pages: ~1.27cm — we exceed this.
 %%
+%% Compact mode (class option 'compact'): denser text block for books that
+%% must fit the 550-page KDP hardcover limit. Still comfortably above KDP
+%% minima for <=550 pages (gutter tier 0.75in = 1.9cm, edges 0.25in = 0.64cm):
+%%   inner 2.2cm (0.87in) · outer 1.7cm (0.67in) · top 2.0cm · bottom 2.2cm
+%%
+\if@bcpcompact
+\RequirePackage[
+  paperwidth  = 7in,
+  paperheight = 10in,
+  twoside,
+  inner       = 2.2cm,
+  outer       = 1.7cm,
+  top         = 2.0cm,
+  bottom      = 2.2cm,
+  headsep     = 0.4cm,
+  footskip    = 1.0cm,
+  includeheadfoot,
+]{geometry}
+\else
 \RequirePackage[
   paperwidth  = 7in,
   paperheight = 10in,
@@ -34,6 +53,7 @@
   footskip    = 1.2cm,
   includeheadfoot,
 ]{geometry}
+\fi
 
 %% ─── Running headers and footers ─────────────────────────────────────────────
 \RequirePackage{fancyhdr}
@@ -119,6 +139,17 @@
 \tolerance     = 1000
 \emergencystretch = 2em
 \hfuzz         = 0.5pt
+
+%% Compact mode: tighter paragraph and float spacing.
+%% \parskip must be set at begin-document: the parskip package (loaded later
+%% by bcpedu.cls) would otherwise overwrite the value set here.
+\if@bcpcompact
+  \setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+  \setlength{\floatsep}{8pt plus 2pt minus 2pt}
+  \setlength{\intextsep}{8pt plus 2pt minus 2pt}
+  \setlength{\abovecaptionskip}{6pt}
+  \AtBeginDocument{\setlength{\parskip}{0.3\baselineskip plus 0.05\baselineskip}}
+\fi
 
 %% ─── Column separation (for multi-column sections, e.g. index) ───────────────
 \setlength{\columnsep}{1.5em}

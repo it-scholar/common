@@ -31,19 +31,28 @@
 %% ─── Class options ───────────────────────────────────────────────────────────
 \newif\if@bcpprint   \@bcpprintfalse   % default: digital
 \newif\if@bcpkdp     \@bcpkdpfalse
+\newif\if@bcpcompact \@bcpcompactfalse
 
 \DeclareOption{digital}{\@bcpprintfalse}
 \DeclareOption{print}{\@bcpprinttrue}
 \DeclareOption{kdp}{\@bcpkdptrue}
+%% compact: tighter typography for long books that must fit the KDP
+%% hardcover 550-page limit (10pt body, smaller code, reduced spacing).
+%% Content is unchanged; only density increases.
+\DeclareOption{compact}{\@bcpcompacttrue}
 
 %% Pass all unknown options to the book class
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
 \ProcessOptions\relax
 
 %% ─── Base class ──────────────────────────────────────────────────────────────
-%% 11pt, A4/letter-neutral (geometry handles actual size), two-sided, chapters
-%% open on right-hand (odd) pages.
-\LoadClass[11pt,twoside,openright]{book}
+%% 11pt (10pt with the compact option), A4/letter-neutral (geometry handles
+%% actual size), two-sided, chapters open on right-hand (odd) pages.
+\if@bcpcompact
+  \LoadClass[10pt,twoside,openright]{book}
+\else
+  \LoadClass[11pt,twoside,openright]{book}
+\fi
 
 %% ─── Core utilities (needed before everything else) ──────────────────────────
 \RequirePackage{etoolbox}   % \AtBeginDocument, \apptocmd, \patchcmd

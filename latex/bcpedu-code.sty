@@ -58,9 +58,16 @@
 \newcommand{\bcpMintedStyleDark}{monokai}
 
 %% Global minted defaults
+%% Compact mode (class option 'compact'): code drops from \small to
+%% \footnotesize — code blocks dominate page count in technical books.
+\if@bcpcompact
+  \newcommand{\bcpcodefontsize}{\footnotesize}
+\else
+  \newcommand{\bcpcodefontsize}{\small}
+\fi
 \setminted{
   breaklines = true,
-  fontsize   = \small,
+  fontsize   = \bcpcodefontsize,
   tabsize    = 4,
 }
 
@@ -111,7 +118,7 @@
   %% xleftmargin gives line numbers their space inside the frame.
   %% numbersep controls the gap between number and code text.
   %% 2em accommodates 2-digit line numbers (up to 99) comfortably.
-  minted options  = {style=friendly, linenos=true, fontsize=\small, tabsize=4,
+  minted options  = {style=friendly, linenos=true, fontsize=\bcpcodefontsize, tabsize=4,
                      breaklines=true, breakanywhere=true, breakautoindent=false,
                      xleftmargin=2em, numbersep=6pt},
   %% Redefine \theFancyVerbLine just before content is typeset so line numbers
@@ -143,7 +150,7 @@
   listing engine  = minted,
   listing only,
   minted language = {#1},
-  minted options  = {style=friendly, linenos=false, fontsize=\small, tabsize=4,
+  minted options  = {style=friendly, linenos=false, fontsize=\bcpcodefontsize, tabsize=4,
                      breaklines=true, breakanywhere=true, breakautoindent=false},
   colback         = bcpCodeBg,
   colframe        = bcpCodeBorder,
@@ -170,7 +177,7 @@
   minted language = bash,
   %% linenos=true so fancyvrb renders one entry per line — we replace the
   %% number with a non-copyable $ prompt via \theFancyVerbLine below.
-  minted options  = {style=monokai, linenos=true, fontsize=\small, tabsize=4,
+  minted options  = {style=monokai, linenos=true, fontsize=\bcpcodefontsize, tabsize=4,
                      breaklines=true, breakanywhere=true, breakautoindent=false,
                      xleftmargin=2em, numbersep=8pt},
   before upper    = {%
@@ -205,7 +212,7 @@
   %% so coltext below controls ALL output text color reliably.
   %% breakanywhere: machine output (JSON logs, URLs, kubectl wide output)
   %% has no spaces to break at — without it such lines overflow the box.
-  minted options  = {style=bw, linenos=false, fontsize=\small, tabsize=4,
+  minted options  = {style=bw, linenos=false, fontsize=\bcpcodefontsize, tabsize=4,
                      breaklines=true, breakanywhere=true, breakautoindent=false},
   colback         = bcpTermOutBg,
   colframe        = bcpTermOutBg,

@@ -54,7 +54,7 @@
 
 \titlespacing*{\part}
   {0pt}   % left indent
-  {3.5cm} % top space before label
+  {\if@bcpcompact 2.2cm\else 3.5cm\fi} % top space before label
   {0pt}   % after (no extra after-code space needed)
 
 %% ─── Chapter headings ────────────────────────────────────────────────────────
@@ -80,12 +80,12 @@
   }
   {1.2em}
   {\raggedright\bfseries\fontsize{28pt}{34pt}\selectfont\color{bcpTextMain}}
-  [\vspace{2.0cm}]
+  [\if@bcpcompact\vspace{1.2cm}\else\vspace{2.0cm}\fi]
 
 \titlespacing*{\chapter}
   {0pt}   % left indent
-  {3.5cm} % top space before label (matches \vspace*{3.5cm} in business plan)
-  {0pt}   % after (after-code \vspace{2.0cm} handles paragraph gap)
+  {\if@bcpcompact 2.2cm\else 3.5cm\fi} % top space before label
+  {0pt}   % after (after-code \vspace handles paragraph gap)
 
 %% ─── Section ─────────────────────────────────────────────────────────────────
 %% Gold square + number, bold sans. No rule. Space alone creates hierarchy.
@@ -96,7 +96,7 @@
   {}
 
 \titlespacing*{\section}
-  {0pt}{22pt plus 4pt minus 2pt}{3pt plus 1pt}
+  {0pt}{\if@bcpcompact 17pt plus 3pt minus 2pt\else 22pt plus 4pt minus 2pt\fi}{3pt plus 1pt}
 
 %% ─── Subsection ──────────────────────────────────────────────────────────────
 %% Gray square + number, bold sans, slightly smaller.
@@ -107,7 +107,7 @@
   {}
 
 \titlespacing*{\subsection}
-  {0pt}{14pt plus 3pt minus 2pt}{4pt plus 1pt}
+  {0pt}{\if@bcpcompact 11pt plus 2pt minus 2pt\else 14pt plus 3pt minus 2pt\fi}{4pt plus 1pt}
 
 %% ─── Subsubsection ───────────────────────────────────────────────────────────
 %% Tiny gray square + number, lighter text weight.

@@ -390,7 +390,8 @@ When `\bookisbn` is set it is also printed on the copyright page
 - **Margin verification:** `task check-margins` renders every page of
   `out/main-print.pdf` and fails if any ink lies outside the KDP reviewer's
   safe zone (0.25" from top/bottom/outer trim; page-count-dependent gutter,
-  max 0.875" for 701-828 pages). Run it before every KDP (re)submission;
+  max 0.875" for 701-828 pages) **or if the book exceeds the 550-page KDP
+  hardcover limit**. Run it before every KDP (re)submission;
   pass extra flags after `--`, e.g. `task check-margins -- --pages 720-740`.
 - **Spine width:** `task cover-print` uses the exact KDP formula per paper type
   (white 0.002252"/page, cream 0.0025", color 0.002347") via `kdp-metadata.py
