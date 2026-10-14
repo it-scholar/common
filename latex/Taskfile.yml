@@ -28,6 +28,7 @@
 #   task distclean        — remove all build artifacts including PDFs
 #   task watch            — live-rebuild on file changes (requires latexmk -pvc)
 #   task lint             — run lacheck (if available)
+#   task check-margins    — verify no ink outside KDP safe margins in print PDF
 #
 # Cover tasks expect a book's cover/cover.tex (\documentclass{bcpedu-cover}),
 # see common/latex/bcpedu-cover.cls. Override COVER_DIR/COVER_MAIN vars if a
@@ -190,6 +191,16 @@ tasks:
         else
           echo "lacheck not found — skipping lint"
         fi
+
+  check-margins:
+    desc: Verify no content lies outside the KDP safe margins in the print PDF
+    deps: [_ensure_outdir]
+    cmds:
+      - 'echo "==> Checking KDP safe margins: {{.PRINT_PDF}}"'
+      - >-
+        python3 "{{.COMMON_DIR}}/check-margins.py"
+        --pdf "{{.PRINT_PDF}}" --verbose
+        {{.CLI_ARGS}}
 
   clean:
     desc: Remove all build artifacts (out/ + any stray root-level files)

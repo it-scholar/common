@@ -127,6 +127,7 @@ common/
     bcpedu-back.sty       Glossary, index, bibliography, appendix
     bcpedu-index.ist      MakeIndex style for back-of-book index
     kdp-metadata.py       KDP title-setup metadata generator (`task kdp`)
+    check-margins.py      KDP safe-margin verifier for the print PDF (`task check-margins`)
     Taskfile.yml          Shared build rules (included from each book's Taskfile)
     README.md             This file
 ```
@@ -386,6 +387,11 @@ When `\bookisbn` is set it is also printed on the copyright page
 ### Notes
 
 - **Trim/margins** are already KDP-compatible (7"×10", large trim class).
+- **Margin verification:** `task check-margins` renders every page of
+  `out/main-print.pdf` and fails if any ink lies outside the KDP reviewer's
+  safe zone (0.25" from top/bottom/outer trim; page-count-dependent gutter,
+  max 0.875" for 701-828 pages). Run it before every KDP (re)submission;
+  pass extra flags after `--`, e.g. `task check-margins -- --pages 720-740`.
 - **Spine width:** `task cover-print` uses the exact KDP formula per paper type
   (white 0.002252"/page, cream 0.0025", color 0.002347") via `kdp-metadata.py
   --spine-only`, falling back to the old 0.0025" approximation if the script

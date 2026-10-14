@@ -182,10 +182,12 @@
 \usetikzlibrary{calc}             % coordinate arithmetic for TikZ nodes
 \RequirePackage{booktabs}          % \toprule, \midrule, \bottomrule
 \RequirePackage{longtable}         % tables spanning multiple pages
+\RequirePackage{xltabular}         % longtable with tabularx X columns (breakable wide tables)
 \RequirePackage{multirow}          % multirow table cells
 \RequirePackage{array}             % extended column specs
 \RequirePackage{tabularx}          % auto-width table columns
 \RequirePackage{rotating}          % sidewaystable/figure: full-page landscape floats
+\RequirePackage{lscape}            % landscape env: rotated multi-page sections (KDP-safe: content-only rotation, no /Rotate page attribute)
 \RequirePackage{enumitem}          % list spacing control
 \RequirePackage{xspace}            % smart trailing space in macros
 \RequirePackage{calc}              % length arithmetic
