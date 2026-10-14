@@ -56,6 +56,7 @@ vars:
   COVER_DIGITAL_PDF: "{{.OUT_DIR}}/cover-digital.pdf"
   COVER_PRINT_PDF: "{{.OUT_DIR}}/cover-print.pdf"
   COVER_THUMBNAIL_PNG: "{{.OUT_DIR}}/cover-thumbnail.png"
+  COVER_EBOOK_JPG: "{{.OUT_DIR}}/cover-ebook.jpg"
 
 tasks:
   default:
@@ -94,11 +95,12 @@ tasks:
       - 'echo "==> Done: {{.PRINT_PDF}}"'
 
   cover:
-    desc: Build all cover artifacts (digital front, print wraparound, thumbnail)
+    desc: Build all cover artifacts (digital front, print wraparound, thumbnail, ebook JPEG)
     cmds:
       - task: cover-digital
       - task: cover-print
       - task: cover-thumbnail
+      - task: cover-ebook
 
   cover-digital:
     desc: Build the front-cover-only PDF (trim size, no bleed) - digital/thumbnail use
@@ -158,6 +160,27 @@ tasks:
           exit 1
         fi
         echo "==> Done: {{.COVER_THUMBNAIL_PNG}}"
+
+  cover-ebook:
+    desc: Rasterize the digital front cover to the KDP ebook cover JPEG (2560px tall)
+    deps: [cover-digital]
+    cmds:
+      # KDP ebook cover: JPEG, RGB, longest side >= 1000px; recommended
+      # 1600x2560 (1.6:1). Our 7"x10" cover at 256dpi renders 1792x2560 —
+      # above the minimum, and the 1.43:1 ratio is accepted (KDP pads the
+      # catalog listing as needed).
+      - |
+        if command -v pdftoppm >/dev/null 2>&1; then
+          pdftoppm -r 256 -jpeg -jpegopt quality=95 -singlefile \
+            "{{.COVER_DIGITAL_PDF}}" "{{.OUT_DIR}}/cover-ebook"
+        elif command -v magick >/dev/null 2>&1; then
+          magick -density 256 "{{.COVER_DIGITAL_PDF}}" -quality 95 \
+            "{{.COVER_EBOOK_JPG}}"
+        else
+          echo "ERROR: need pdftoppm (poppler-utils) or ImageMagick 'magick' to build the ebook cover" >&2
+          exit 1
+        fi
+        echo "==> Done: {{.COVER_EBOOK_JPG}}"
 
   kdp:
     desc: Generate KDP title-setup metadata (out/kdp-metadata.md + out/kdp-metadata.json)

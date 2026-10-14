@@ -402,6 +402,9 @@ When `\bookisbn` is set it is also printed on the copyright page
   with KDP's Printing Cost & Royalty Calculator before publishing.
 - **Barcode:** leave the marked 2"×1.2" area on the back cover blank; KDP
   prints the ISBN barcode there.
+- **Ebook cover:** `task cover` also produces `out/cover-ebook.jpg` —
+  the digital front cover rasterized to a 1792×2560px JPEG (KDP ebook
+  requirement: JPEG/TIFF, longest side ≥ 1000px; 1600×2560 recommended).
 - The `kdp` class option (`\documentclass[print,kdp]{bcpedu}`) is reserved for
   future PDF/X-1a output and currently has no effect.
 
